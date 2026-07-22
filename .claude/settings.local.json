@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php artisan *)",
+      "Bash(php -v)",
+      "Bash(curl -s -o /tmp/home.html -w \"%{http_code}\\\\n\" http://127.0.0.1:8899/)",
+      "Read(//tmp/**)",
+      "Bash('/c/Program Files/Google/Chrome/Application/chrome.exe' --headless=new --disable-gpu --hide-scrollbars --window-size=1440,2600 --screenshot=C:/Users/ASUS/AppData/Local/Temp/claude/C--Users-ASUS-Documents-Kampus-Semester-6-TA-Bansosweb/a2dd0a85-aad2-4dbc-990e-29b63c1f92da/scratchpad/home.png --virtual-time-budget=6000 http://127.0.0.1:8899/)",
+      "Bash('/c/Program Files/Google/Chrome/Application/chrome.exe' --headless=new --disable-gpu --hide-scrollbars --window-size=420,2400 --screenshot=C:/Users/ASUS/AppData/Local/Temp/claude/C--Users-ASUS-Documents-Kampus-Semester-6-TA-Bansosweb/a2dd0a85-aad2-4dbc-990e-29b63c1f92da/scratchpad/home-mobile.png --virtual-time-budget=6000 http://127.0.0.1:8899/)",
+      "Bash(node C:/Users/ASUS/AppData/Local/Temp/claude/C--Users-ASUS-Documents-Kampus-Semester-6-TA-Bansosweb/a2dd0a85-aad2-4dbc-990e-29b63c1f92da/scratchpad/cdp.mjs http://127.0.0.1:8899/ 1440 900 C:/Users/ASUS/AppData/Local/Temp/claude/C--Users-ASUS-Documents-Kampus-Semester-6-TA-Bansosweb/a2dd0a85-aad2-4dbc-990e-29b63c1f92da/scratchpad/desk-final.png)",
+      "Bash(node *)",
+      "Bash('/c/Program Files/Google/Chrome/Application/chrome.exe' --headless=new --disable-gpu --hide-scrollbars --window-size=1440,2100 --screenshot=C:/Users/ASUS/AppData/Local/Temp/claude/C--Users-ASUS-Documents-Kampus-Semester-6-TA-Bansosweb/a2dd0a85-aad2-4dbc-990e-29b63c1f92da/scratchpad/tentang-a.png --virtual-time-budget=6000 http://127.0.0.1:8899/tentang)",
+      "Bash(php -r '$db=new PDO\\(\"sqlite:database/database.sqlite\"\\); foreach\\($db->query\\(\"select id,name,email,role,nik from users\"\\) as $r\\){echo $r[\"id\"].\" | \".$r[\"name\"].\" | \".$r[\"email\"].\" | \".$r[\"role\"].\" | \".$r[\"nik\"].\"\\\\n\";} echo \"pengaduans: \"; echo $db->query\\(\"select count\\(*\\) c from pengaduans\"\\)->fetch\\(\\)[\"c\"].\"\\\\n\";')",
+      "Bash(php -r '$db=new PDO\\(\"sqlite:database/database.sqlite\"\\); foreach\\($db->query\\(\"select name from sqlite_master where type=\\\\\"table\\\\\"\"\\) as $r\\) echo $r[\"name\"].\" \"; echo \"\\\\n--- users cols: \"; foreach\\($db->query\\(\"pragma table_info\\(users\\)\"\\) as $r\\) echo $r[\"name\"].\" \"; echo \"\\\\n\"; foreach\\($db->query\\(\"select id,name,email from users limit 10\"\\) as $r\\) echo $r[\"id\"].\" | \".$r[\"name\"].\" | \".$r[\"email\"].\"\\\\n\";')",
+      "Bash(php -r ' *)",
+      "Bash(sed -i 's|document.querySelector\\('\\\\''form'\\\\''\\).noValidate = true;|document.querySelector\\('\\\\''form[action*=\"/pengaduan\"]'\\\\''\\).noValidate = true;|' C:/Users/ASUS/AppData/Local/Temp/claude/C--Users-ASUS-Documents-Kampus-Semester-6-TA-Bansosweb/a2dd0a85-aad2-4dbc-990e-29b63c1f92da/scratchpad/submit.mjs)",
+      "Bash(sed -i 's|document.querySelector\\('\\\\''form'\\\\''\\).submit\\(\\); true;\\\\\\\\n`\\);|X|' C:/Users/ASUS/AppData/Local/Temp/claude/C--Users-ASUS-Documents-Kampus-Semester-6-TA-Bansosweb/a2dd0a85-aad2-4dbc-990e-29b63c1f92da/scratchpad/submit.mjs)",
+      "Bash(sed -i '37s|document.querySelector\\('\\\\''form'\\\\''\\)|document.querySelector\\('\\\\''form[action*=\"/pengaduan\"]'\\\\''\\)|' C:/Users/ASUS/AppData/Local/Temp/claude/C--Users-ASUS-Documents-Kampus-Semester-6-TA-Bansosweb/a2dd0a85-aad2-4dbc-990e-29b63c1f92da/scratchpad/submit.mjs)",
+      "Bash(sed -i '53s|document.querySelector\\('\\\\''form'\\\\''\\)|document.querySelector\\('\\\\''form[action*=\"/pengaduan\"]'\\\\''\\)|' C:/Users/ASUS/AppData/Local/Temp/claude/C--Users-ASUS-Documents-Kampus-Semester-6-TA-Bansosweb/a2dd0a85-aad2-4dbc-990e-29b63c1f92da/scratchpad/submit.mjs)",
+      "PowerShell(Remove-Item *)",
+      "PowerShell(php artisan view:clear; php artisan view:cache)",
+      "PowerShell(php artisan view:clear)",
+      "PowerShell(php artisan view:cache; php artisan view:clear)",
+      "PowerShell(php artisan migrate --force)",
+      "PowerShell(php artisan migrate:status)",
+      "PowerShell(php artisan migrate --force --path=database/migrations/2026_07_22_090000_create_beritas_table.php)",
+      "PowerShell(php artisan view:cache; php artisan view:clear; php artisan route:list --name=berita)",
+      "PowerShell(php \"C:\\\\Users\\\\ASUS\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ASUS-Documents-Kampus-Semester-6-TA-Bansosweb\\\\07131535-15ed-4618-81e5-3cbd0826c985\\\\scratchpad\\\\uji_berita.php\")"
+    ]
+  }
+}
