@@ -52,6 +52,7 @@
                             ['label' => 'Cek Status','url' => url('/') . '#cek-nik','active' => false],
                             ['label' => 'Pengaduan', 'url' => route('pengaduan'),   'active' => request()->routeIs('pengaduan')],
                             ['label' => 'Berita',    'url' => route('berita.index'),'active' => request()->routeIs('berita.*')],
+                            ['label' => 'Galeri',    'url' => route('galeri.index'),'active' => request()->routeIs('galeri.*')],
                             ['label' => 'Tentang',   'url' => route('tentang'),     'active' => request()->routeIs('tentang')],
                         ];
                     @endphp

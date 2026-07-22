@@ -51,6 +51,18 @@
             'url'    => route('admin.berita.index'),
             'active' => request()->routeIs('admin.berita.*'),
         ],
+        [
+            'label'  => 'Kelola Galeri',
+            'icon'   => 'fa-images',
+            'url'    => route('admin.galeri.index'),
+            'active' => request()->routeIs('admin.galeri.*'),
+        ],
+        [
+            'label'  => 'Kelola Pengguna',
+            'icon'   => 'fa-users',
+            'url'    => route('admin.user.index'),
+            'active' => request()->routeIs('admin.user.*'),
+        ],
     ];
 @endphp
 

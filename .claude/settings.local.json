@@ -25,7 +25,11 @@
       "PowerShell(php artisan migrate:status)",
       "PowerShell(php artisan migrate --force --path=database/migrations/2026_07_22_090000_create_beritas_table.php)",
       "PowerShell(php artisan view:cache; php artisan view:clear; php artisan route:list --name=berita)",
-      "PowerShell(php \"C:\\\\Users\\\\ASUS\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ASUS-Documents-Kampus-Semester-6-TA-Bansosweb\\\\07131535-15ed-4618-81e5-3cbd0826c985\\\\scratchpad\\\\uji_berita.php\")"
+      "PowerShell(php \"C:\\\\Users\\\\ASUS\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ASUS-Documents-Kampus-Semester-6-TA-Bansosweb\\\\07131535-15ed-4618-81e5-3cbd0826c985\\\\scratchpad\\\\uji_berita.php\")",
+      "Bash(php -l app/Http/Controllers/Admin/UserController.php)",
+      "Bash(php -l app/Models/User.php)",
+      "PowerShell(php artisan test --filter=SmokeKelolaGaleriTest)",
+      "PowerShell(php artisan test)"
     ]
   }
 }
