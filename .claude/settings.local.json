@@ -29,7 +29,8 @@
       "Bash(php -l app/Http/Controllers/Admin/UserController.php)",
       "Bash(php -l app/Models/User.php)",
       "PowerShell(php artisan test --filter=SmokeKelolaGaleriTest)",
-      "PowerShell(php artisan test)"
+      "PowerShell(php artisan test)",
+      "Bash(php -l app/Http/Controllers/AuthController.php)"
     ]
   }
 }

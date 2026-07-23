@@ -107,10 +107,6 @@
                     PEMERINTAH KABUPATEN MUKOMUKO &middot; PROVINSI BENGKULU
                 </span>
                 <span class="flex items-center gap-5">
-                    <a href="{{ route('home') }}" class="hover:text-white transition-colors">
-                        <i class="fas fa-arrow-up-right-from-square mr-1.5 opacity-70"></i> Buka Portal Pengguna
-                    </a>
-                    <span class="text-blue-100/40">|</span>
                     <span><i class="fas fa-user-shield mr-1.5 opacity-70"></i> {{ Auth::user()->name }}</span>
                 </span>
             </div>

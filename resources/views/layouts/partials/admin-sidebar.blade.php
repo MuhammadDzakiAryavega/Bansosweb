@@ -27,12 +27,7 @@
 
 <!-- Bawah: profil & keluar -->
 <div class="px-4 py-6 border-t border-white/10">
-    <p class="px-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-100/40 mb-3">Akun</p>
     <div class="space-y-1">
-        <a href="{{ route('profile') }}"
-           class="side-link flex items-center gap-3 px-3 py-2.5 rounded-md text-sm border-l-2 border-transparent text-blue-100/70 font-medium hover:text-white hover:bg-white/5">
-            <i class="fas fa-user-gear w-4 text-center text-xs"></i> Profil Saya
-        </a>
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit"

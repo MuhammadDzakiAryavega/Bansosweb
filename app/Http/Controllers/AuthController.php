@@ -105,14 +105,22 @@ class AuthController extends Controller
         ]);
     }
 
-    /* ---------- PROFIL ---------- */
+    /* ---------- PROFIL (khusus pengguna, admin diarahkan ke dashboard) ---------- */
     public function profile()
     {
+        if (Auth::user()->isAdmin()) {
+            return redirect()->route('dashboard');
+        }
+
         return view('profile.profile');
     }
 
     public function updateProfile(Request $request)
     {
+        if ($request->user()->isAdmin()) {
+            return redirect()->route('dashboard');
+        }
+
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
         ], [
@@ -127,6 +135,10 @@ class AuthController extends Controller
 
     public function updatePassword(Request $request)
     {
+        if ($request->user()->isAdmin()) {
+            return redirect()->route('dashboard');
+        }
+
         $data = $request->validate([
             'current_password' => ['required', 'current_password'],
             'password'          => ['required', 'confirmed', 'min:8'],

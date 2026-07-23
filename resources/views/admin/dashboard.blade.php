@@ -38,9 +38,9 @@
                        class="inline-flex items-center justify-center gap-2 bg-[#14346B] text-white px-6 py-3 rounded-md text-sm font-semibold hover:bg-[#0E2650] transition-colors">
                         <i class="fas fa-bullhorn text-xs"></i> Kelola Pengaduan
                     </a>
-                    <a href="{{ route('home') }}"
+                    <a href="{{ route('admin.user.index') }}"
                        class="inline-flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-md text-sm font-semibold hover:border-[#14346B] hover:text-[#14346B] transition-colors">
-                        <i class="fas fa-house text-xs"></i> Lihat Sisi Pengguna
+                        <i class="fas fa-users text-xs"></i> Kelola Pengguna
                     </a>
                 </div>
             </div>
@@ -207,16 +207,16 @@
                         'link'  => route('admin.berita.index'),
                     ],
                     [
-                        'icon'  => 'fa-user-gear',
-                        'title' => 'Profil Saya',
-                        'desc'  => 'Perbarui data akun dan kata sandi.',
-                        'link'  => route('profile'),
+                        'icon'  => 'fa-images',
+                        'title' => 'Kelola Galeri',
+                        'desc'  => 'Unggah &amp; tata dokumentasi kegiatan.',
+                        'link'  => route('admin.galeri.index'),
                     ],
                     [
-                        'icon'  => 'fa-house',
-                        'title' => 'Beranda Portal',
-                        'desc'  => 'Lihat tampilan portal dari sisi masyarakat.',
-                        'link'  => route('home'),
+                        'icon'  => 'fa-users',
+                        'title' => 'Kelola Pengguna',
+                        'desc'  => 'Atur data akun masyarakat &amp; petugas.',
+                        'link'  => route('admin.user.index'),
                     ],
                 ];
             @endphp
