@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Portal Bansos - Transparan & Tepat Sasaran')</title>
+    <title>@yield('title', 'Portal PKH - Transparan & Tepat Sasaran')</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -49,7 +49,7 @@
                     @php
                         $nav_links = [
                             ['label' => 'Beranda',   'url' => url('/'),            'active' => request()->is('/')],
-                            ['label' => 'Cek Status','url' => url('/') . '#cek-nik','active' => false],
+                            ['label' => 'Daftar PKH','url' => route('pkh.daftar'),  'active' => request()->routeIs('pkh.daftar')],
                             ['label' => 'Pengaduan', 'url' => route('pengaduan'),   'active' => request()->routeIs('pengaduan')],
                             ['label' => 'Berita',    'url' => route('berita.index'),'active' => request()->routeIs('berita.*')],
                             ['label' => 'Galeri',    'url' => route('galeri.index'),'active' => request()->routeIs('galeri.*')],
@@ -178,7 +178,7 @@
                 <h4 class="text-white font-semibold text-sm uppercase tracking-[0.12em] mb-5">Navigasi</h4>
                 <ul class="text-sm space-y-3">
                     <li><a href="{{ url('/') }}" class="hover:text-white transition-colors">Beranda</a></li>
-                    <li><a href="{{ url('/') }}#cek-nik" class="hover:text-white transition-colors">Cek Status Kepesertaan</a></li>
+                    <li><a href="{{ route('pkh.daftar') }}" class="hover:text-white transition-colors">Pendaftaran PKH</a></li>
                     <li><a href="{{ route('pengaduan') }}" class="hover:text-white transition-colors">Pengaduan Masyarakat</a></li>
                     <li><a href="{{ route('tentang') }}" class="hover:text-white transition-colors">Profil Dinas</a></li>
                 </ul>
@@ -188,7 +188,7 @@
                 <h4 class="text-white font-semibold text-sm uppercase tracking-[0.12em] mb-5">Tautan Terkait</h4>
                 <ul class="text-sm space-y-3">
                     <li><a href="https://kemensos.go.id" target="_blank" rel="noopener" class="hover:text-white transition-colors">Kementerian Sosial RI</a></li>
-                    <li><a href="https://cekbansos.kemensos.go.id" target="_blank" rel="noopener" class="hover:text-white transition-colors">Cek Bansos Kemensos</a></li>
+                    <li><a href="https://cekbansos.kemensos.go.id" target="_blank" rel="noopener" class="hover:text-white transition-colors">Cek Status PKH Kemensos</a></li>
                     <li><a href="https://www.lapor.go.id" target="_blank" rel="noopener" class="hover:text-white transition-colors">Layanan Aspirasi (LAPOR!)</a></li>
                     <li><a href="https://mukomukokab.go.id" target="_blank" rel="noopener" class="hover:text-white transition-colors">Pemkab Mukomuko</a></li>
                 </ul>

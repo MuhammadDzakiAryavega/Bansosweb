@@ -218,6 +218,12 @@
                         'desc'  => 'Atur data akun masyarakat &amp; petugas.',
                         'link'  => route('admin.user.index'),
                     ],
+                    [
+                        'icon'  => 'fa-folder-open',
+                        'title' => 'Kelola Arsip',
+                        'desc'  => 'Catat surat masuk, keluar &amp; dokumen penting.',
+                        'link'  => route('admin.arsip.index'),
+                    ],
                 ];
             @endphp
 

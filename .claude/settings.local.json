@@ -30,7 +30,25 @@
       "Bash(php -l app/Models/User.php)",
       "PowerShell(php artisan test --filter=SmokeKelolaGaleriTest)",
       "PowerShell(php artisan test)",
-      "Bash(php -l app/Http/Controllers/AuthController.php)"
+      "Bash(php -l app/Http/Controllers/AuthController.php)",
+      "Bash(php -l app/Models/Arsip.php)",
+      "Bash(php -l app/Http/Controllers/Admin/ArsipController.php)",
+      "PowerShell(php artisan route:list --name=pkh)",
+      "PowerShell(php artisan test tests/Feature/SmokeKelolaPkhTest.php)",
+      "PowerShell(php artisan test 2>&1 | Select-Object -Last 30)",
+      "PowerShell(php artisan migrate 2>&1 | Select-Object -Last 20)",
+      "PowerShell(php artisan test tests/Feature/SmokeKelolaPkhTest.php 2>&1 | Select-Object -Last 40)",
+      "PowerShell(php artisan test 2>&1 | Select-Object -Last 15)",
+      "PowerShell(php artisan migrate 2>&1 | Select-Object -Last 8)",
+      "PowerShell(php artisan route:list --name=pkh 2>&1)",
+      "PowerShell(php artisan test tests/Feature/SmokePendaftaranPkhTest.php 2>&1 | Select-Object -Last 30)",
+      "PowerShell(php artisan test 2>&1 | Select-Object -Last 12)",
+      "PowerShell(php artisan migrate 2>&1 | Select-Object -Last 6)",
+      "PowerShell(php artisan test 2>&1 | Select-Object -Last 8)",
+      "PowerShell(php artisan test tests/Feature/SmokePendaftaranPkhTest.php tests/Feature/SmokeKelolaPkhTest.php 2>&1 | Select-Object -Last 30)",
+      "PowerShell(php artisan test 2>&1 | Select-Object -Last 6)",
+      "PowerShell(php artisan migrate 2>&1 | Select-Object -Last 5)",
+      "PowerShell(php artisan test 2>&1 | Select-Object -Last 20)"
     ]
   }
 }

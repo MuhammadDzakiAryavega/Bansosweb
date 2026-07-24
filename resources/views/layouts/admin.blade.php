@@ -32,12 +32,49 @@
 
 {{-- Menu sidebar: satu sumber, dipakai versi desktop & mobile --}}
 @php
+    // Sub-menu "Kelola PKH" dibangun dari daftar kriteria pada controller agar satu sumber.
+    $pkhChildren = collect(\App\Http\Controllers\Admin\PkhController::KRITERIA)
+        ->map(fn ($k, $slug) => [
+            'label'  => $k['label'],
+            'icon'   => $k['icon'],
+            'url'    => route('admin.pkh.kriteria', $slug),
+            'active' => request()->routeIs('admin.pkh.kriteria') && request()->route('kriteria') === $slug,
+        ])
+        ->values()
+        ->all();
+
+    // Pendaftaran masuk, penilaian calon, & hasil akhir setelah kriteria terakhir.
+    $pkhChildren[] = [
+        'label'  => 'Pendaftaran Masuk',
+        'icon'   => 'fa-inbox',
+        'url'    => route('admin.pkh.pendaftaran.index'),
+        'active' => request()->routeIs('admin.pkh.pendaftaran.*'),
+    ];
+    $pkhChildren[] = [
+        'label'  => 'Penilaian Calon',
+        'icon'   => 'fa-clipboard-check',
+        'url'    => route('admin.pkh.penilaian.index'),
+        'active' => request()->routeIs('admin.pkh.penilaian.*'),
+    ];
+    $pkhChildren[] = [
+        'label'  => 'Hasil Akhir',
+        'icon'   => 'fa-trophy',
+        'url'    => route('admin.pkh.hasil'),
+        'active' => request()->routeIs('admin.pkh.hasil'),
+    ];
+
     $menu = [
         [
             'label'  => 'Dashboard',
             'icon'   => 'fa-gauge-high',
             'url'    => route('dashboard'),
             'active' => request()->routeIs('dashboard'),
+        ],
+        [
+            'label'    => 'Kelola PKH',
+            'icon'     => 'fa-clipboard-list',
+            'active'   => request()->routeIs('admin.pkh.*'),
+            'children' => $pkhChildren,
         ],
         [
             'label'  => 'Kelola Pengaduan',
@@ -62,6 +99,12 @@
             'icon'   => 'fa-users',
             'url'    => route('admin.user.index'),
             'active' => request()->routeIs('admin.user.*'),
+        ],
+        [
+            'label'  => 'Kelola Arsip',
+            'icon'   => 'fa-folder-open',
+            'url'    => route('admin.arsip.index'),
+            'active' => request()->routeIs('admin.arsip.*'),
         ],
     ];
 @endphp

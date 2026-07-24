@@ -75,16 +75,34 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
-            if (Auth::user()->isAdmin()) {
-                return redirect()->intended(route('dashboard'));
-            }
-
-            return redirect()->route('home');
+            return redirect()->to($this->tujuanSetelahLogin($request));
         }
 
         return back()
             ->withErrors(['email' => 'Email atau password salah.'])
             ->onlyInput('email');
+    }
+
+    /**
+     * Tujuan setelah login berhasil.
+     *
+     * Alamat yang sempat dituju saat masih tamu (url.intended) hanya dipakai
+     * bila sesuai peran. Tanpa penyaringan ini, admin yang tadinya menekan menu
+     * "Pengaduan" di navbar publik akan mendarat di halaman pengguna, bukan dashboard.
+     */
+    private function tujuanSetelahLogin(Request $request): string
+    {
+        $tujuan = $request->session()->pull('url.intended');
+        $adalahAdmin = Auth::user()->isAdmin();
+
+        $keAreaAdmin = $tujuan
+            && str_starts_with(ltrim((string) parse_url($tujuan, PHP_URL_PATH), '/'), 'admin');
+
+        if ($tujuan && $keAreaAdmin === $adalahAdmin) {
+            return $tujuan;
+        }
+
+        return $adalahAdmin ? route('dashboard') : route('home');
     }
 
     /* ---------- DASHBOARD ---------- */

@@ -48,9 +48,9 @@
                     </p>
 
                     <div class="mt-8 flex flex-col sm:flex-row gap-3">
-                        <a href="#cek-nik"
+                        <a href="{{ route('pkh.daftar') }}"
                            class="inline-flex items-center justify-center gap-2 bg-[#14346B] text-white px-6 py-3 rounded-md text-sm font-semibold hover:bg-[#0E2650] transition-colors">
-                            <i class="fas fa-magnifying-glass text-xs"></i> Cek Status Kepesertaan
+                            <i class="fas fa-user-plus text-xs"></i> Daftar PKH
                         </a>
                         <a href="{{ route('pengaduan') }}"
                            class="inline-flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-md text-sm font-semibold hover:border-[#14346B] hover:text-[#14346B] transition-colors">
@@ -75,34 +75,38 @@
                     </dl>
                 </div>
 
-                <!-- Kolom kanan: panel cek status -->
-                <div id="cek-nik" class="lg:col-span-5 scroll-mt-28">
+                <!-- Kolom kanan: ajakan pendaftaran PKH -->
+                <div id="daftar-pkh" class="lg:col-span-5 scroll-mt-28">
                     <div class="border border-slate-200 rounded-lg overflow-hidden bg-white">
                         <div class="bg-[#14346B] px-6 py-4">
                             <h2 class="text-white font-semibold text-base flex items-center gap-2">
-                                <i class="fas fa-id-card text-sm opacity-80"></i> Cek Status Kepesertaan
+                                <i class="fas fa-user-plus text-sm opacity-80"></i> Pendaftaran PKH
                             </h2>
-                            <p class="text-blue-100/80 text-xs mt-1">Masukkan Nomor Induk Kependudukan (16 digit)</p>
+                            <p class="text-blue-100/80 text-xs mt-1">Ajukan diri sebagai calon penerima Program Keluarga Harapan</p>
                         </div>
 
-                        <form id="form-cek-nik" class="px-6 py-6" novalidate>
-                            <label for="nik" class="block text-sm font-semibold text-slate-700 mb-2">NIK</label>
-                            <input type="text" id="nik" name="nik" inputmode="numeric" maxlength="16"
-                                   placeholder="Contoh: 1706xxxxxxxxxxxx"
-                                   class="w-full border border-slate-300 rounded-md px-4 py-3 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#14346B] focus:ring-1 focus:ring-[#14346B] transition">
+                        <div class="px-6 py-6">
+                            <p class="text-sm text-slate-600 leading-relaxed">
+                                Lengkapi data diri dan kondisi ekonomi keluarga Anda. Pengajuan ditinjau petugas Dinas Sosial
+                                dan dinilai secara objektif menggunakan metode <span class="font-semibold text-slate-800">SAW</span>.
+                            </p>
 
-                            <button type="submit"
-                                    class="mt-4 w-full bg-[#14346B] text-white py-3 rounded-md text-sm font-semibold hover:bg-[#0E2650] transition-colors">
-                                Periksa Status
-                            </button>
+                            <ul class="mt-5 space-y-2.5 text-sm text-slate-600">
+                                <li class="flex items-start gap-2.5"><i class="fas fa-circle-check text-[#14346B] mt-0.5 text-xs"></i> Gratis, tanpa dipungut biaya apa pun</li>
+                                <li class="flex items-start gap-2.5"><i class="fas fa-circle-check text-[#14346B] mt-0.5 text-xs"></i> Data pribadi dijaga kerahasiaannya</li>
+                                <li class="flex items-start gap-2.5"><i class="fas fa-circle-check text-[#14346B] mt-0.5 text-xs"></i> Status pengajuan dapat dipantau</li>
+                            </ul>
 
-                            <p id="nik-message" class="hidden mt-4 text-sm rounded-md border px-4 py-3 leading-relaxed"></p>
+                            <a href="{{ route('pkh.daftar') }}"
+                               class="mt-6 w-full inline-flex items-center justify-center gap-2 bg-[#14346B] text-white py-3 rounded-md text-sm font-semibold hover:bg-[#0E2650] transition-colors">
+                                <i class="fas fa-file-signature text-xs"></i> Daftar Sekarang
+                            </a>
 
                             <p class="mt-4 text-xs text-slate-500 leading-relaxed border-t border-slate-100 pt-4">
-                                Data kepesertaan bersifat rahasia dan hanya digunakan untuk keperluan verifikasi
-                                penyaluran bantuan sosial.
+                                Perlu masuk ke akun terlebih dahulu. Belum punya akun?
+                                <a href="{{ route('register') }}" class="text-[#14346B] font-semibold hover:underline">Daftar akun</a>.
                             </p>
-                        </form>
+                        </div>
                     </div>
 
                     <!-- Jam layanan -->
@@ -140,11 +144,11 @@
             @php
                 $layanan = [
                     [
-                        'icon'  => 'fa-magnifying-glass',
-                        'title' => 'Cek Status Kepesertaan',
-                        'desc'  => 'Periksa status kepesertaan PKH berdasarkan Nomor Induk Kependudukan.',
-                        'link'  => '#cek-nik',
-                        'label' => 'Cek Sekarang',
+                        'icon'  => 'fa-user-plus',
+                        'title' => 'Pendaftaran PKH',
+                        'desc'  => 'Ajukan diri sebagai calon penerima PKH dan lengkapi data kondisi ekonomi keluarga.',
+                        'link'  => route('pkh.daftar'),
+                        'label' => 'Daftar Sekarang',
                     ],
                     [
                         'icon'  => 'fa-circle-info',

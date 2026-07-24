@@ -1,12 +1,17 @@
 <?php
 
+use App\Http\Controllers\Admin\ArsipController as AdminArsipController;
 use App\Http\Controllers\Admin\BeritaController as AdminBeritaController;
 use App\Http\Controllers\Admin\GaleriController as AdminGaleriController;
+use App\Http\Controllers\Admin\PendaftaranController as AdminPendaftaranController;
 use App\Http\Controllers\Admin\PengaduanController as AdminPengaduanController;
+use App\Http\Controllers\Admin\PkhController as AdminPkhController;
+use App\Http\Controllers\Admin\PkhPenilaianController as AdminPkhPenilaianController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BeritaController;
 use App\Http\Controllers\GaleriController;
+use App\Http\Controllers\PendaftaranPkhController;
 use App\Http\Controllers\PengaduanController;
 use Illuminate\Support\Facades\Route;
 
@@ -57,6 +62,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/pengaduan', [PengaduanController::class, 'create'])->name('pengaduan');
     Route::post('/pengaduan', [PengaduanController::class, 'store'])->name('pengaduan.store');
     Route::get('/pengaduan/riwayat', [PengaduanController::class, 'riwayat'])->name('pengaduan.riwayat');
+
+    // Pendaftaran PKH (wajib login)
+    Route::get('/pendaftaran-pkh', [PendaftaranPkhController::class, 'create'])->name('pkh.daftar');
+    Route::post('/pendaftaran-pkh', [PendaftaranPkhController::class, 'store'])->name('pkh.daftar.store');
 });
 
 // --- AREA ADMIN (hanya untuk role admin) ---
@@ -84,6 +93,46 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/pengguna/{user}/ubah', [AdminUserController::class, 'edit'])->name('user.edit');
     Route::put('/pengguna/{user}', [AdminUserController::class, 'update'])->name('user.update');
     Route::delete('/pengguna/{user}', [AdminUserController::class, 'destroy'])->name('user.destroy');
+
+    // Kelola arsip (dokumen internal, hanya admin)
+    Route::get('/arsip', [AdminArsipController::class, 'index'])->name('arsip.index');
+    Route::get('/arsip/tambah', [AdminArsipController::class, 'create'])->name('arsip.create');
+    Route::post('/arsip', [AdminArsipController::class, 'store'])->name('arsip.store');
+    Route::get('/arsip/{arsip}/ubah', [AdminArsipController::class, 'edit'])->name('arsip.edit');
+    Route::get('/arsip/{arsip}/lampiran', [AdminArsipController::class, 'unduh'])->name('arsip.unduh');
+    Route::put('/arsip/{arsip}', [AdminArsipController::class, 'update'])->name('arsip.update');
+    Route::delete('/arsip/{arsip}', [AdminArsipController::class, 'destroy'])->name('arsip.destroy');
+
+    // Kelola PKH — Sistem Pendukung Keputusan metode SAW
+    Route::prefix('pkh')->name('pkh.')->group(function () {
+        // Pendaftaran calon (pengajuan warga yang ditinjau admin)
+        Route::get('/pendaftaran', [AdminPendaftaranController::class, 'index'])->name('pendaftaran.index');
+        Route::get('/pendaftaran/{pendaftaran}', [AdminPendaftaranController::class, 'show'])->name('pendaftaran.show');
+        Route::get('/pendaftaran/{pendaftaran}/foto/{jenis}', [AdminPendaftaranController::class, 'foto'])->name('pendaftaran.foto');
+        Route::post('/pendaftaran/{pendaftaran}/verifikasi', [AdminPendaftaranController::class, 'verifikasi'])->name('pendaftaran.verifikasi');
+        Route::post('/pendaftaran/{pendaftaran}/tolak', [AdminPendaftaranController::class, 'tolak'])->name('pendaftaran.tolak');
+        Route::delete('/pendaftaran/{pendaftaran}', [AdminPendaftaranController::class, 'destroy'])->name('pendaftaran.destroy');
+
+        // Penilaian calon penerima (alternatif = warga terdaftar)
+        Route::get('/penilaian', [AdminPkhPenilaianController::class, 'index'])->name('penilaian.index');
+        Route::post('/penilaian', [AdminPkhPenilaianController::class, 'store'])->name('penilaian.store');
+        Route::get('/penilaian/{alternatif}/nilai', [AdminPkhPenilaianController::class, 'edit'])->name('penilaian.edit');
+        Route::put('/penilaian/{alternatif}', [AdminPkhPenilaianController::class, 'update'])->name('penilaian.update');
+        Route::delete('/penilaian/{alternatif}', [AdminPkhPenilaianController::class, 'destroy'])->name('penilaian.destroy');
+
+        // Hasil akhir perankingan SAW
+        Route::get('/hasil-akhir', [AdminPkhController::class, 'hasil'])->name('hasil');
+
+        // Sub-kriteria (himpunan) tiap kriteria
+        Route::post('/{kriteria}/sub', [AdminPkhController::class, 'storeSub'])
+            ->whereIn('kriteria', array_keys(AdminPkhController::KRITERIA))->name('sub.store');
+        Route::put('/sub/{sub}', [AdminPkhController::class, 'updateSub'])->name('sub.update');
+        Route::delete('/sub/{sub}', [AdminPkhController::class, 'destroySub'])->name('sub.destroy');
+
+        // Kelola satu kriteria (paling akhir agar tidak menelan segmen di atas)
+        Route::get('/{kriteria}', [AdminPkhController::class, 'show'])
+            ->whereIn('kriteria', array_keys(AdminPkhController::KRITERIA))->name('kriteria');
+    });
 
     // Kelola pengaduan
     Route::get('/pengaduan', [AdminPengaduanController::class, 'index'])->name('pengaduan.index');
