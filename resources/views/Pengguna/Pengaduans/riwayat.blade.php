@@ -65,25 +65,6 @@
     <section class="bg-slate-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
-            @if ($pengaduans->isNotEmpty())
-                @php
-                    $ringkasan = [
-                        ['label' => 'Total Laporan', 'value' => $pengaduans->count()],
-                        ['label' => 'Baru', 'value' => $pengaduans->where('status_pengaduan', 'Baru')->count()],
-                        ['label' => 'Dalam Proses', 'value' => $pengaduans->whereIn('status_pengaduan', ['Dalam Proses', 'Pending'])->count()],
-                        ['label' => 'Selesai', 'value' => $pengaduans->where('status_pengaduan', 'Selesai')->count()],
-                    ];
-                @endphp
-                <dl class="mb-6 grid grid-cols-2 lg:grid-cols-4 gap-px bg-slate-200 border border-slate-200 rounded-lg overflow-hidden">
-                    @foreach($ringkasan as $item)
-                    <div class="bg-white px-5 py-4">
-                        <dt class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">{{ $item['label'] }}</dt>
-                        <dd class="text-2xl font-bold text-[#0E2650] mt-1 tabular-nums">{{ $item['value'] }}</dd>
-                    </div>
-                    @endforeach
-                </dl>
-            @endif
-
             @forelse ($pengaduans as $item)
                 @php
                     $badge = match ($item->status_pengaduan) {

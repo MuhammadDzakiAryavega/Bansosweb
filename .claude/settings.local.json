@@ -48,7 +48,11 @@
       "PowerShell(php artisan test tests/Feature/SmokePendaftaranPkhTest.php tests/Feature/SmokeKelolaPkhTest.php 2>&1 | Select-Object -Last 30)",
       "PowerShell(php artisan test 2>&1 | Select-Object -Last 6)",
       "PowerShell(php artisan migrate 2>&1 | Select-Object -Last 5)",
-      "PowerShell(php artisan test 2>&1 | Select-Object -Last 20)"
+      "PowerShell(php artisan test 2>&1 | Select-Object -Last 20)",
+      "PowerShell(php artisan db:seed --class=PkhDemoSeeder 2>&1 | Select-Object -Last 15)",
+      "PowerShell(php artisan tinker --execute=\"echo 'Sub-kriteria: '.App\\\\Models\\\\SubKriteria::count\\(\\).PHP_EOL; echo 'Calon \\(alternatif\\): '.App\\\\Models\\\\Alternatif::count\\(\\).PHP_EOL; echo 'Penilaian: '.App\\\\Models\\\\Penilaian::count\\(\\).PHP_EOL; echo 'Pendaftaran: '.App\\\\Models\\\\Pendaftaran::count\\(\\).PHP_EOL;\")",
+      "PowerShell(New-Item *)",
+      "PowerShell($d=\"C:\\\\Users\\\\ASUS\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ASUS-Documents-Kampus-Semester-6-TA-Bansosweb\\\\ef39d1b9-c7ea-4c02-92ae-ba20d543c5c1\\\\scratchpad\"; try { $w=New-Object -ComObject Word.Application } catch { \"NO_WORD: $_\"; exit 1 }; $w.Visible=$false; $doc=$w.Documents.Open\\(\"C:\\\\Users\\\\ASUS\\\\Documents\\\\Kampus\\\\Semester 6\\\\TA\\\\Bansosweb\\\\Panduan-TA-D3-Jurusan-TI.pdf\",$false,$true\\); $doc.SaveAs\\(\"$d\\\\panduan.txt\",2\\); $doc.Close\\(0\\); $w.Quit\\(\\); \"OK\"; \\(Get-Content \"$d\\\\panduan.txt\" | Measure-Object -Line\\).Lines)"
     ]
   }
 }
