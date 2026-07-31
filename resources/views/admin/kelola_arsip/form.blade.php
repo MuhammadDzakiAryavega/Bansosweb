@@ -158,7 +158,7 @@
                            class="w-full text-sm text-slate-600 file:mr-4 file:py-2.5 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#14346B] file:text-white hover:file:bg-[#0E2650] file:cursor-pointer border rounded-md p-2 @error('lampiran') border-rose-300 @else border-slate-300 @enderror">
                     <p class="mt-2 text-xs text-slate-500 leading-relaxed">
                         Format PDF, DOC, DOCX, XLS, XLSX, JPG, atau PNG. Ukuran maksimal 5 MB.
-                        Berkas tersimpan di penyimpanan internal dan hanya bisa diunduh oleh administrator.
+                        Berkas tersimpan di penyimpanan internal dan hanya bisa diunduh oleh petugas seksi.
                     </p>
                     <p x-show="berkasBaru" x-cloak class="mt-2 text-xs text-[#14346B] font-semibold">
                         <i class="fas fa-paperclip mr-1"></i> <span x-text="berkasBaru"></span>
@@ -239,7 +239,7 @@
                         </div>
                         <p class="mt-3 text-xs text-slate-500 leading-relaxed">
                             <i class="fas fa-lock mr-1 opacity-70"></i>
-                            Arsip tidak ditampilkan di portal pengguna. Status ini hanya penanda internal admin.
+                            Arsip tidak ditampilkan di portal pengguna. Status ini hanya penanda internal petugas.
                         </p>
                     </div>
                 </div>

@@ -143,12 +143,10 @@
                                        class="mt-0.5 accent-[#14346B]">
                                 <span>
                                     <span class="block text-sm font-semibold text-slate-800">
-                                        {{ $role === 'admin' ? 'Administrator' : 'Masyarakat' }}
+                                        {{ \App\Models\User::ROLE_LABEL[$role] }}
                                     </span>
                                     <span class="block text-xs text-slate-500 mt-0.5 leading-relaxed">
-                                        {{ $role === 'admin'
-                                            ? 'Dapat mengelola berita, pengaduan, dan pengguna.'
-                                            : 'Hanya dapat membaca berita dan mengirim pengaduan.' }}
+                                        {{ \App\Models\User::ROLE_KETERANGAN[$role] }}
                                     </span>
                                 </span>
                             </label>

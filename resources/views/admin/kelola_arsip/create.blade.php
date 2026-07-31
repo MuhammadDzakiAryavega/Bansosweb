@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Tambah Arsip - Admin Portal PKH')
+@section('title', 'Tambah Arsip - Panel Portal PKH')
 @section('page-title', 'Tambah Arsip')
 @section('page-subtitle', 'Catat surat atau dokumen baru ke dalam daftar arsip Dinas Sosial.')
 

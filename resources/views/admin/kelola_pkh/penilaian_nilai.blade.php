@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Kelola PKH — Nilai Calon - Admin Portal PKH')
+@section('title', 'Kelola PKH — Nilai Calon - Panel Portal PKH')
 @section('page-title', 'Kelola PKH')
 @section('page-subtitle', 'Pilih sub-kriteria yang sesuai untuk tiap kriteria. Nilai crisp akan dipakai pada perhitungan SAW.')
 
@@ -131,9 +131,9 @@
                         @if ($opsi->isEmpty())
                             <p class="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-4 py-3 leading-relaxed">
                                 <i class="fas fa-triangle-exclamation mr-1.5"></i>
-                                Belum ada sub-kriteria.
-                                <a href="{{ route('admin.pkh.kriteria', $slug) }}" class="font-semibold underline hover:no-underline">Tambahkan dulu</a>
-                                sebelum menilai kriteria ini.
+                                Belum ada sub-kriteria. Mintakan lebih dulu kepada
+                                <span class="font-semibold">administrator</span> melalui menu Kelola Kriteria
+                                sebelum kriteria ini dapat dinilai.
                             </p>
                         @else
                             <label for="sub-{{ $slug }}" class="sr-only">Sub-kriteria {{ $k['label'] }}</label>

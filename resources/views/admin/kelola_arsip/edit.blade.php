@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Ubah Arsip - Admin Portal PKH')
+@section('title', 'Ubah Arsip - Panel Portal PKH')
 @section('page-title', 'Ubah Arsip')
 @section('page-subtitle', 'Perbarui identitas dokumen, klasifikasi, lampiran, atau status publikasi arsip.')
 

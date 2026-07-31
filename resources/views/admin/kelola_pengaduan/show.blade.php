@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Detail Pengaduan - Admin Portal PKH')
+@section('title', 'Detail Pengaduan - Panel Portal PKH')
 @section('page-title', 'Detail Pengaduan')
 @section('page-subtitle', 'Tinjau isi pengaduan dan perbarui status penanganannya.')
 

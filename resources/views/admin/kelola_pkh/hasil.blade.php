@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Kelola PKH — Hasil Akhir - Admin Portal PKH')
+@section('title', 'Kelola PKH — Hasil Akhir - Panel Portal PKH')
 @section('page-title', 'Kelola PKH')
 @section('page-subtitle', 'Hasil akhir perankingan calon penerima PKH berdasarkan metode SAW (Simple Additive Weighting).')
 

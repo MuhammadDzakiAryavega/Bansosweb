@@ -18,7 +18,11 @@
                 <i class="far fa-clock mr-1.5"></i>
                 Terdaftar {{ $user->created_at->translatedFormat('d F Y, H:i') }} WIB
             </span>
-            <span class="text-[11px] font-semibold px-3 py-1.5 rounded-md border {{ $user->isAdmin() ? 'bg-[#C8102E]/5 text-[#C8102E] border-[#C8102E]/20' : 'bg-[#14346B]/5 text-[#14346B] border-[#14346B]/20' }}">
+            <span class="text-[11px] font-semibold px-3 py-1.5 rounded-md border {{ match ($user->role) {
+                'admin' => 'bg-[#C8102E]/5 text-[#C8102E] border-[#C8102E]/20',
+                'seksi' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                default => 'bg-[#14346B]/5 text-[#14346B] border-[#14346B]/20',
+            } }}">
                 {{ $user->labelRole() }}
             </span>
         </div>

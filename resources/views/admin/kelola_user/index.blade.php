@@ -2,7 +2,7 @@
 
 @section('title', 'Kelola Pengguna - Admin Portal PKH')
 @section('page-title', 'Kelola Pengguna')
-@section('page-subtitle', 'Kelola akun masyarakat dan administrator yang memiliki akses ke portal PKH.')
+@section('page-subtitle', 'Kelola akun masyarakat, administrator, dan seksi yang memiliki akses ke portal PKH.')
 
 @section('content')
 
@@ -24,15 +24,16 @@
             [
                 'label' => 'Administrator',
                 'value' => $statistik['admin'],
-                'desc'  => 'Memiliki akses panel admin',
+                'desc'  => 'Mengelola berita, galeri & akun',
                 'icon'  => 'fa-user-shield',
                 'accent' => true,
             ],
             [
-                'label' => 'Akun Baru',
-                'value' => $statistik['baru'],
-                'desc'  => 'Terdaftar dalam 30 hari terakhir',
-                'icon'  => 'fa-user-plus',
+                'label' => 'Seksi',
+                'value' => $statistik['seksi'],
+                'desc'  => 'Mengelola PKH, pengaduan & arsip',
+                'icon'  => 'fa-user-tie',
+                'accent' => true,
             ],
         ];
     @endphp
@@ -71,7 +72,7 @@
                     <option value="">Semua Peran</option>
                     @foreach ($roleList as $role)
                         <option value="{{ $role }}" @selected(request('role') === $role)>
-                            {{ $role === 'admin' ? 'Administrator' : 'Masyarakat' }}
+                            {{ \App\Models\User::ROLE_LABEL[$role] }}
                         </option>
                     @endforeach
                 </select>
@@ -111,15 +112,23 @@
                 <tbody class="divide-y divide-slate-200">
                     @forelse ($users as $item)
                         @php
-                            $badge = $item->isAdmin()
-                                ? 'bg-[#C8102E]/5 text-[#C8102E] border-[#C8102E]/20'
-                                : 'bg-[#14346B]/5 text-[#14346B] border-[#14346B]/20';
+                            // Warna dibedakan per peran agar akun petugas mudah dikenali sekilas.
+                            $badge = match ($item->role) {
+                                'admin' => 'bg-[#C8102E]/5 text-[#C8102E] border-[#C8102E]/20',
+                                'seksi' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                                default => 'bg-[#14346B]/5 text-[#14346B] border-[#14346B]/20',
+                            };
+                            $avatar = match ($item->role) {
+                                'admin' => 'bg-[#C8102E] text-white',
+                                'seksi' => 'bg-emerald-600 text-white',
+                                default => 'bg-[#14346B] text-white',
+                            };
                             $akunSendiri = $item->is(Auth::user());
                         @endphp
                         <tr class="hover:bg-slate-50 transition-colors align-top">
                             <td class="px-6 py-4">
                                 <div class="flex items-start gap-4">
-                                    <span class="w-10 h-10 rounded-md flex items-center justify-center flex-shrink-0 font-semibold text-sm {{ $item->isAdmin() ? 'bg-[#C8102E] text-white' : 'bg-[#14346B] text-white' }}">
+                                    <span class="w-10 h-10 rounded-md flex items-center justify-center flex-shrink-0 font-semibold text-sm {{ $avatar }}">
                                         {{ strtoupper(substr($item->name, 0, 1)) }}
                                     </span>
                                     <div class="min-w-0 max-w-xs">

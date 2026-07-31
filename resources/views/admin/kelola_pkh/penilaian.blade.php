@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Kelola PKH — Penilaian Calon - Admin Portal PKH')
+@section('title', 'Kelola PKH — Penilaian Calon - Panel Portal PKH')
 @section('page-title', 'Kelola PKH')
 @section('page-subtitle', 'Daftar calon penerima (warga terdaftar) beserta penilaian tiap kriteria sebagai dasar perhitungan SAW.')
 

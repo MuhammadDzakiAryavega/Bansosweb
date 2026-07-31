@@ -32,8 +32,8 @@ class UserController extends Controller
         $statistik = [
             'total'      => User::count(),
             'admin'      => User::where('role', 'admin')->count(),
+            'seksi'      => User::where('role', 'seksi')->count(),
             'masyarakat' => User::where('role', 'user')->count(),
-            'baru'       => User::where('created_at', '>=', now()->subDays(30))->count(),
         ];
 
         return view('admin.kelola_user.index', [

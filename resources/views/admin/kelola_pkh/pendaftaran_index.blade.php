@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Kelola PKH — Pendaftaran Masuk - Admin Portal PKH')
+@section('title', 'Kelola PKH — Pendaftaran Masuk - Panel Portal PKH')
 @section('page-title', 'Kelola PKH')
 @section('page-subtitle', 'Pengajuan warga yang ingin menjadi calon penerima PKH. Tinjau lalu verifikasi untuk menambahkannya ke penilaian SAW.')
 

@@ -20,6 +20,17 @@ class UserSeeder extends Seeder
             ]
         );
 
+        // Seksi (petugas Dinas Sosial: PKH, pengaduan, arsip)
+        User::updateOrCreate(
+            ['email' => 'seksi@pkh.test'],
+            [
+                'name'     => 'Seksi Dinas Sosial',
+                'nik'      => '1701010101010003',
+                'password' => 'password',
+                'role'     => 'seksi',
+            ]
+        );
+
         // Pengguna (masyarakat)
         User::updateOrCreate(
             ['email' => 'user@pkh.test'],

@@ -1,8 +1,8 @@
 @extends('layouts.admin')
 
-@section('title', 'Kelola Arsip - Admin Portal PKH')
+@section('title', 'Kelola Arsip - Panel Portal PKH')
 @section('page-title', 'Kelola Arsip')
-@section('page-subtitle', 'Pencatatan surat masuk, surat keluar, dan dokumen penting Dinas Sosial. Arsip beserta lampirannya hanya dapat diakses oleh administrator.')
+@section('page-subtitle', 'Pencatatan surat masuk, surat keluar, dan dokumen penting Dinas Sosial. Arsip beserta lampirannya hanya dapat diakses oleh petugas seksi.')
 
 @section('content')
 

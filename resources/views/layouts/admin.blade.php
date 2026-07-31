@@ -30,38 +30,11 @@
 </head>
 <body class="bg-slate-50 font-sans min-h-screen text-slate-800" x-data="{ sidebar: false }">
 
-{{-- Menu sidebar: satu sumber, dipakai versi desktop & mobile --}}
+{{-- Menu sidebar: satu sumber, dipakai versi desktop & mobile.
+     Isinya mengikuti peran, selaras dengan pembagian rute di routes/web.php. --}}
 @php
-    // Sub-menu "Kelola PKH" dibangun dari daftar kriteria pada controller agar satu sumber.
-    $pkhChildren = collect(\App\Http\Controllers\Admin\PkhController::KRITERIA)
-        ->map(fn ($k, $slug) => [
-            'label'  => $k['label'],
-            'icon'   => $k['icon'],
-            'url'    => route('admin.pkh.kriteria', $slug),
-            'active' => request()->routeIs('admin.pkh.kriteria') && request()->route('kriteria') === $slug,
-        ])
-        ->values()
-        ->all();
-
-    // Pendaftaran masuk, penilaian calon, & hasil akhir setelah kriteria terakhir.
-    $pkhChildren[] = [
-        'label'  => 'Pendaftaran Masuk',
-        'icon'   => 'fa-inbox',
-        'url'    => route('admin.pkh.pendaftaran.index'),
-        'active' => request()->routeIs('admin.pkh.pendaftaran.*'),
-    ];
-    $pkhChildren[] = [
-        'label'  => 'Penilaian Calon',
-        'icon'   => 'fa-clipboard-check',
-        'url'    => route('admin.pkh.penilaian.index'),
-        'active' => request()->routeIs('admin.pkh.penilaian.*'),
-    ];
-    $pkhChildren[] = [
-        'label'  => 'Hasil Akhir',
-        'icon'   => 'fa-trophy',
-        'url'    => route('admin.pkh.hasil'),
-        'active' => request()->routeIs('admin.pkh.hasil'),
-    ];
+    $petugas    = Auth::user();
+    $labelPanel = $petugas->isSeksi() ? 'PANEL SEKSI' : 'PANEL ADMIN';
 
     $menu = [
         [
@@ -70,43 +43,69 @@
             'url'    => route('dashboard'),
             'active' => request()->routeIs('dashboard'),
         ],
-        [
-            'label'    => 'Kelola PKH',
-            'icon'     => 'fa-clipboard-list',
-            'active'   => request()->routeIs('admin.pkh.*'),
-            'children' => $pkhChildren,
-        ],
-        [
+    ];
+
+    if ($petugas->isSeksi()) {
+        $menu[] = [
+            'label'  => 'Pendaftaran Masuk',
+            'icon'   => 'fa-inbox',
+            'url'    => route('admin.pkh.pendaftaran.index'),
+            'active' => request()->routeIs('admin.pkh.pendaftaran.*'),
+        ];
+        $menu[] = [
+            'label'  => 'Penilaian Calon',
+            'icon'   => 'fa-clipboard-check',
+            'url'    => route('admin.pkh.penilaian.index'),
+            'active' => request()->routeIs('admin.pkh.penilaian.*'),
+        ];
+        $menu[] = [
+            'label'  => 'Hasil Akhir',
+            'icon'   => 'fa-trophy',
+            'url'    => route('admin.pkh.hasil'),
+            'active' => request()->routeIs('admin.pkh.hasil'),
+        ];
+        $menu[] = [
             'label'  => 'Kelola Pengaduan',
             'icon'   => 'fa-bullhorn',
             'url'    => route('admin.pengaduan.index'),
             'active' => request()->routeIs('admin.pengaduan.*'),
-        ],
-        [
-            'label'  => 'Kelola Berita',
-            'icon'   => 'fa-newspaper',
-            'url'    => route('admin.berita.index'),
-            'active' => request()->routeIs('admin.berita.*'),
-        ],
-        [
-            'label'  => 'Kelola Galeri',
-            'icon'   => 'fa-images',
-            'url'    => route('admin.galeri.index'),
-            'active' => request()->routeIs('admin.galeri.*'),
-        ],
-        [
-            'label'  => 'Kelola Pengguna',
-            'icon'   => 'fa-users',
-            'url'    => route('admin.user.index'),
-            'active' => request()->routeIs('admin.user.*'),
-        ],
-        [
+        ];
+        $menu[] = [
             'label'  => 'Kelola Arsip',
             'icon'   => 'fa-folder-open',
             'url'    => route('admin.arsip.index'),
             'active' => request()->routeIs('admin.arsip.*'),
-        ],
-    ];
+        ];
+    }
+
+    if ($petugas->isAdmin()) {
+        // Seluruh kriteria C1–C5 dikelola pada satu halaman, jadi cukup satu menu
+        // tepat di bawah Dashboard.
+        $menu[] = [
+            'label'  => 'Kelola Kriteria',
+            'icon'   => 'fa-sliders',
+            'url'    => route('admin.pkh.kriteria'),
+            'active' => request()->routeIs('admin.pkh.kriteria'),
+        ];
+        $menu[] = [
+            'label'  => 'Kelola Berita',
+            'icon'   => 'fa-newspaper',
+            'url'    => route('admin.berita.index'),
+            'active' => request()->routeIs('admin.berita.*'),
+        ];
+        $menu[] = [
+            'label'  => 'Kelola Galeri',
+            'icon'   => 'fa-images',
+            'url'    => route('admin.galeri.index'),
+            'active' => request()->routeIs('admin.galeri.*'),
+        ];
+        $menu[] = [
+            'label'  => 'Kelola Pengguna',
+            'icon'   => 'fa-users',
+            'url'    => route('admin.user.index'),
+            'active' => request()->routeIs('admin.user.*'),
+        ];
+    }
 @endphp
 
 <!-- GARIS IDENTITAS MERAH -->
@@ -116,7 +115,7 @@
 
     <!-- ================= SIDEBAR (desktop) ================= -->
     <aside class="hidden lg:flex flex-col w-72 flex-shrink-0 bg-[#0E2650] text-white sticky top-0 self-start h-screen">
-        @include('layouts.partials.admin-sidebar', ['menu' => $menu])
+        @include('layouts.partials.admin-sidebar', ['menu' => $menu, 'labelPanel' => $labelPanel])
     </aside>
 
     <!-- ================= SIDEBAR (mobile drawer) ================= -->
@@ -136,7 +135,7 @@
                     class="absolute top-4 right-4 w-9 h-9 rounded-md border border-white/20 hover:bg-white/10 flex items-center justify-center transition-colors">
                 <i class="fas fa-xmark"></i>
             </button>
-            @include('layouts.partials.admin-sidebar', ['menu' => $menu])
+            @include('layouts.partials.admin-sidebar', ['menu' => $menu, 'labelPanel' => $labelPanel])
         </aside>
     </div>
 
@@ -161,7 +160,7 @@
                     class="w-10 h-10 rounded-md border border-slate-300 text-slate-600 flex items-center justify-center hover:border-[#14346B] hover:text-[#14346B] transition-colors">
                 <i class="fas fa-bars"></i>
             </button>
-            <span class="text-sm font-bold text-[#0E2650] tracking-tight">PANEL ADMIN</span>
+            <span class="text-sm font-bold text-[#0E2650] tracking-tight">{{ $labelPanel }}</span>
             <span class="w-9 h-9 rounded-md bg-[#14346B] text-white flex items-center justify-center font-semibold text-xs">
                 {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
             </span>
@@ -172,7 +171,7 @@
             <!-- Header halaman -->
             <div class="mb-8">
                 <span class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
-                    Administrasi Portal PKH
+                    {{ $petugas->labelRole() }} &middot; Portal PKH
                 </span>
                 <h1 class="text-2xl md:text-3xl font-bold text-[#0E2650] mt-2 tracking-tight">
                     @yield('page-title', 'Dashboard')
@@ -204,7 +203,7 @@
         <footer class="bg-[#0E2650] text-blue-100/50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 text-xs flex flex-col sm:flex-row items-center justify-between gap-2">
                 <p>&copy; {{ date('Y') }} Dinas Sosial Kabupaten Mukomuko. Seluruh hak cipta dilindungi.</p>
-                <p>Panel Administrator Portal PKH &middot; Kec. Teramang Jaya</p>
+                <p>{{ $petugas->labelRole() }} Portal PKH &middot; Kec. Teramang Jaya</p>
             </div>
         </footer>
     </div>

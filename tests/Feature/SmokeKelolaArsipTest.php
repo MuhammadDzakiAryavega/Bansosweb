@@ -13,14 +13,14 @@ class SmokeKelolaArsipTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function admin(): User
+    private function seksi(): User
     {
         return User::create([
-            'name'     => 'Admin Arsip',
+            'name'     => 'Seksi Arsip',
             'nik'      => '8888888888888888',
-            'email'    => 'admin.arsip@example.com',
+            'email'    => 'seksi.arsip@example.com',
             'password' => 'rahasia123',
-            'role'     => 'admin',
+            'role'     => 'seksi',
         ]);
     }
 
@@ -39,22 +39,22 @@ class SmokeKelolaArsipTest extends TestCase
 
     public function test_halaman_kelola_arsip_dapat_diakses(): void
     {
-        $admin = $this->admin();
+        $seksi = $this->seksi();
         $arsip = $this->arsip();
 
-        $this->actingAs($admin)->get('/admin/arsip')->assertOk()
+        $this->actingAs($seksi)->get('/admin/arsip')->assertOk()
             ->assertSee('ARS/001/V/2026')
             ->assertSee('Surat Undangan Rapat Koordinasi PKH')
             ->assertSee('Surat Masuk');
 
-        $this->actingAs($admin)->get('/admin/arsip?cari=undangan&klasifikasi=Surat+Masuk&status=Published&tahun=2026')
+        $this->actingAs($seksi)->get('/admin/arsip?cari=undangan&klasifikasi=Surat+Masuk&status=Published&tahun=2026')
             ->assertOk()->assertSee('ARS/001/V/2026');
 
         // Nomor usulan otomatis muncul pada formulir tambah.
-        $this->actingAs($admin)->get('/admin/arsip/tambah')->assertOk()
+        $this->actingAs($seksi)->get('/admin/arsip/tambah')->assertOk()
             ->assertSee('Lainnya (buat klasifikasi baru)');
 
-        $this->actingAs($admin)->get("/admin/arsip/{$arsip->id_arsip}/ubah")->assertOk()
+        $this->actingAs($seksi)->get("/admin/arsip/{$arsip->id_arsip}/ubah")->assertOk()
             ->assertSee('ARS/001/V/2026');
     }
 
@@ -77,9 +77,9 @@ class SmokeKelolaArsipTest extends TestCase
     public function test_tambah_arsip_beserta_lampiran(): void
     {
         Storage::fake('local');
-        $admin = $this->admin();
+        $seksi = $this->seksi();
 
-        $this->actingAs($admin)->post('/admin/arsip', [
+        $this->actingAs($seksi)->post('/admin/arsip', [
             'nomor_arsip'        => 'ARS/002/VI/2026',
             'tgl_dokumen'        => '2026-06-15',
             'judul_arsip'        => 'Laporan Penyaluran Bantuan Tahap II',
@@ -97,16 +97,16 @@ class SmokeKelolaArsipTest extends TestCase
         Storage::disk('local')->assertExists($arsip->lampiran);
 
         // Lampiran hanya bisa diunduh lewat rute admin.
-        $this->actingAs($admin)->get("/admin/arsip/{$arsip->id_arsip}/lampiran")
+        $this->actingAs($seksi)->get("/admin/arsip/{$arsip->id_arsip}/lampiran")
             ->assertOk()
             ->assertDownload('laporan-tahap-2.pdf');
     }
 
     public function test_klasifikasi_baru_bisa_dibuat_dan_ikut_jadi_pilihan(): void
     {
-        $admin = $this->admin();
+        $seksi = $this->seksi();
 
-        $this->actingAs($admin)->post('/admin/arsip', [
+        $this->actingAs($seksi)->post('/admin/arsip', [
             'nomor_arsip'      => 'ARS/003/VII/2026',
             'tgl_dokumen'      => '2026-07-01',
             'judul_arsip'      => 'Nota Dinas Penugasan Pendamping',
@@ -120,15 +120,15 @@ class SmokeKelolaArsipTest extends TestCase
         $this->assertNull($arsip->tanggal_publikasi);
         $this->assertContains('Nota Dinas', Arsip::daftarKlasifikasi());
 
-        // Klasifikasi buatan admin tersedia pada saringan daftar & formulir berikutnya.
-        $this->actingAs($admin)->get('/admin/arsip')->assertOk()->assertSee('Nota Dinas');
+        // Klasifikasi buatan petugas tersedia pada saringan daftar & formulir berikutnya.
+        $this->actingAs($seksi)->get('/admin/arsip')->assertOk()->assertSee('Nota Dinas');
     }
 
     public function test_klasifikasi_baru_wajib_diisi_saat_memilih_lainnya(): void
     {
-        $admin = $this->admin();
+        $seksi = $this->seksi();
 
-        $this->actingAs($admin)->post('/admin/arsip', [
+        $this->actingAs($seksi)->post('/admin/arsip', [
             'nomor_arsip'      => 'ARS/004/VII/2026',
             'tgl_dokumen'      => '2026-07-02',
             'judul_arsip'      => 'Dokumen Tanpa Klasifikasi',
@@ -140,7 +140,7 @@ class SmokeKelolaArsipTest extends TestCase
     public function test_ubah_arsip_mengganti_lampiran_lama(): void
     {
         Storage::fake('local');
-        $admin = $this->admin();
+        $seksi = $this->seksi();
 
         $lama = UploadedFile::fake()->create('lama.pdf', 50, 'application/pdf')->store('arsip', 'local');
         $arsip = $this->arsip([
@@ -149,7 +149,7 @@ class SmokeKelolaArsipTest extends TestCase
             'lampiran_ukuran' => 51200,
         ]);
 
-        $this->actingAs($admin)->put("/admin/arsip/{$arsip->id_arsip}", [
+        $this->actingAs($seksi)->put("/admin/arsip/{$arsip->id_arsip}", [
             'nomor_arsip'      => 'ARS/001/V/2026',
             'tgl_dokumen'      => '2026-05-12',
             'judul_arsip'      => 'Surat Undangan Rapat Koordinasi PKH (Revisi)',
@@ -167,7 +167,7 @@ class SmokeKelolaArsipTest extends TestCase
     public function test_lampiran_bisa_dihapus_tanpa_menghapus_arsip(): void
     {
         Storage::fake('local');
-        $admin = $this->admin();
+        $seksi = $this->seksi();
 
         $berkas = UploadedFile::fake()->create('dibuang.pdf', 30, 'application/pdf')->store('arsip', 'local');
         $arsip = $this->arsip([
@@ -176,7 +176,7 @@ class SmokeKelolaArsipTest extends TestCase
             'lampiran_ukuran' => 30720,
         ]);
 
-        $this->actingAs($admin)->put("/admin/arsip/{$arsip->id_arsip}", [
+        $this->actingAs($seksi)->put("/admin/arsip/{$arsip->id_arsip}", [
             'nomor_arsip'      => 'ARS/001/V/2026',
             'tgl_dokumen'      => '2026-05-10',
             'judul_arsip'      => 'Surat Undangan Rapat Koordinasi PKH',
@@ -195,7 +195,7 @@ class SmokeKelolaArsipTest extends TestCase
     public function test_hapus_arsip_membuang_lampirannya(): void
     {
         Storage::fake('local');
-        $admin = $this->admin();
+        $seksi = $this->seksi();
 
         $berkas = UploadedFile::fake()->create('arsip.pdf', 40, 'application/pdf')->store('arsip', 'local');
         $arsip = $this->arsip([
@@ -204,7 +204,7 @@ class SmokeKelolaArsipTest extends TestCase
             'lampiran_ukuran' => 40960,
         ]);
 
-        $this->actingAs($admin)->delete("/admin/arsip/{$arsip->id_arsip}")
+        $this->actingAs($seksi)->delete("/admin/arsip/{$arsip->id_arsip}")
             ->assertRedirect(route('admin.arsip.index'));
 
         $this->assertNull(Arsip::find($arsip->id_arsip));
@@ -213,13 +213,13 @@ class SmokeKelolaArsipTest extends TestCase
 
     public function test_validasi_menolak_isian_kosong_dan_nomor_ganda(): void
     {
-        $admin = $this->admin();
+        $seksi = $this->seksi();
         $this->arsip();
 
-        $this->actingAs($admin)->post('/admin/arsip', [])
+        $this->actingAs($seksi)->post('/admin/arsip', [])
             ->assertSessionHasErrors(['nomor_arsip', 'tgl_dokumen', 'judul_arsip', 'klasifikasi', 'status_publikasi']);
 
-        $this->actingAs($admin)->post('/admin/arsip', [
+        $this->actingAs($seksi)->post('/admin/arsip', [
             'nomor_arsip'      => 'ARS/001/V/2026',
             'tgl_dokumen'      => '2026-05-20',
             'judul_arsip'      => 'Dokumen dengan nomor kembar',

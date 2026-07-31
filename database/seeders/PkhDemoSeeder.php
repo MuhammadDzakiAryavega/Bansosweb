@@ -14,7 +14,7 @@ use Illuminate\Database\Seeder;
  * Data contoh untuk memahami alur SPK-SAW PKH.
  *
  * Jalankan: php artisan db:seed --class=PkhDemoSeeder
- * Aman diulang (memakai updateOrCreate). Mengisi: admin demo, sub-kriteria
+ * Aman diulang (memakai updateOrCreate). Mengisi: akun seksi demo, sub-kriteria
  * tiap kriteria (skala 1-5), calon penerima + penilaiannya di 3 desa, satu
  * calon belum lengkap, serta contoh pengajuan (Baru & Ditolak).
  */
@@ -22,10 +22,12 @@ class PkhDemoSeeder extends Seeder
 {
     public function run(): void
     {
-        /* 1) Admin demo -------------------------------------------------- */
+        /* 1) Petugas seksi demo (pemegang modul PKH) --------------------- */
         User::updateOrCreate(
-            ['email' => 'admin@pkh.test'],
-            ['name' => 'Admin Demo', 'nik' => '0000000000000001', 'password' => 'password', 'role' => 'admin'],
+            ['email' => 'seksi@pkh.test'],
+            // NIK dibedakan dari admin demo (…0001) agar seeder tetap aman diulang
+            // pada basis data yang sudah berisi akun admin lama.
+            ['name' => 'Seksi Demo', 'nik' => '0000000000000002', 'password' => 'password', 'role' => 'seksi'],
         );
 
         /* 2) Sub-kriteria (himpunan) tiap kriteria — skala 1-5 ----------- */
@@ -105,7 +107,7 @@ class PkhDemoSeeder extends Seeder
         }
 
         /* 5) Contoh pengajuan (Pendaftaran Masuk) ------------------------ */
-        // (a) Baru — siap diverifikasi admin (akun ada, belum jadi calon).
+        // (a) Baru — siap diverifikasi seksi (akun ada, belum jadi calon).
         $marni = User::updateOrCreate(
             ['nik' => '1771010101010010'],
             ['name' => 'Marni', 'email' => 'marni@warga.test', 'password' => 'password', 'role' => 'user'],
@@ -141,6 +143,6 @@ class PkhDemoSeeder extends Seeder
             ],
         );
 
-        $this->command?->info('Seeder PKH selesai. Login admin: admin@pkh.test / password');
+        $this->command?->info('Seeder PKH selesai. Login seksi: seksi@pkh.test / password');
     }
 }

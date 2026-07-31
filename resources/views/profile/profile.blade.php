@@ -94,8 +94,8 @@
                             <div class="px-6 py-3.5 flex items-start justify-between gap-4">
                                 <dt class="text-slate-500">Jenis Akun</dt>
                                 <dd>
-                                    <span class="inline-flex items-center gap-2 text-[11px] font-semibold px-3 py-1.5 rounded-md border {{ $user->isAdmin() ? 'border-[#14346B]/20 bg-[#14346B]/5 text-[#14346B]' : 'border-slate-200 bg-slate-50 text-slate-600' }}">
-                                        {{ $user->isAdmin() ? 'Administrator' : 'Masyarakat' }}
+                                    <span class="inline-flex items-center gap-2 text-[11px] font-semibold px-3 py-1.5 rounded-md border {{ $user->isPetugas() ? 'border-[#14346B]/20 bg-[#14346B]/5 text-[#14346B]' : 'border-slate-200 bg-slate-50 text-slate-600' }}">
+                                        {{ $user->labelRole() }}
                                     </span>
                                 </dd>
                             </div>

@@ -32,11 +32,11 @@ class SmokePendaftaranPkhTest extends TestCase
         ];
     }
 
-    private function admin(): User
+    private function seksi(): User
     {
         return User::create([
-            'name' => 'Admin', 'nik' => '9000000000000000',
-            'email' => 'admin@example.com', 'password' => 'rahasia123', 'role' => 'admin',
+            'name' => 'Seksi', 'nik' => '9000000000000000',
+            'email' => 'seksi@example.com', 'password' => 'rahasia123', 'role' => 'seksi',
         ]);
     }
 
@@ -100,18 +100,18 @@ class SmokePendaftaranPkhTest extends TestCase
         $this->assertSame(0, Pendaftaran::count());
     }
 
-    public function test_foto_hanya_dapat_dilihat_admin(): void
+    public function test_foto_hanya_dapat_dilihat_petugas_seksi(): void
     {
-        $admin = $this->admin();
+        $seksi = $this->seksi();
         $warga = $this->warga();
 
         $this->actingAs($warga)->post('/pendaftaran-pkh', $this->isianValid() + $this->fotoValid());
         $daftar = Pendaftaran::where('user_id', $warga->id)->firstOrFail();
 
         // Admin dapat membuka foto rumah maupun foto identitas; jenis asing → 404.
-        $this->actingAs($admin)->get("/admin/pkh/pendaftaran/{$daftar->id}/foto/foto_depan")->assertOk();
-        $this->actingAs($admin)->get("/admin/pkh/pendaftaran/{$daftar->id}/foto/foto_ktp")->assertOk();
-        $this->actingAs($admin)->get("/admin/pkh/pendaftaran/{$daftar->id}/foto/foto_ngawur")->assertNotFound();
+        $this->actingAs($seksi)->get("/admin/pkh/pendaftaran/{$daftar->id}/foto/foto_depan")->assertOk();
+        $this->actingAs($seksi)->get("/admin/pkh/pendaftaran/{$daftar->id}/foto/foto_ktp")->assertOk();
+        $this->actingAs($seksi)->get("/admin/pkh/pendaftaran/{$daftar->id}/foto/foto_ngawur")->assertNotFound();
 
         // Warga biasa tidak boleh mengakses foto lewat area admin.
         $this->actingAs($warga)->get("/admin/pkh/pendaftaran/{$daftar->id}/foto/foto_depan")->assertForbidden();
@@ -140,25 +140,25 @@ class SmokePendaftaranPkhTest extends TestCase
         $this->assertSame(1, Pendaftaran::where('user_id', $warga->id)->count());
     }
 
-    public function test_admin_dapat_meninjau_daftar_dan_detail(): void
+    public function test_seksi_dapat_meninjau_daftar_dan_detail(): void
     {
-        $admin = $this->admin();
+        $seksi = $this->seksi();
         $warga = $this->warga();
         $daftar = Pendaftaran::create($this->isianValid() + ['user_id' => $warga->id, 'status' => 'Baru']);
 
-        $this->actingAs($admin)->get('/admin/pkh/pendaftaran')->assertOk()->assertSee('Budi Santoso');
-        $this->actingAs($admin)->get("/admin/pkh/pendaftaran/{$daftar->id}")->assertOk()
+        $this->actingAs($seksi)->get('/admin/pkh/pendaftaran')->assertOk()->assertSee('Budi Santoso');
+        $this->actingAs($seksi)->get("/admin/pkh/pendaftaran/{$daftar->id}")->assertOk()
             ->assertSee('Budi Santoso')
             ->assertSee(Pendaftaran::KONDISI_RUMAH[0]);
     }
 
     public function test_verifikasi_menjadikan_pengaju_sebagai_calon(): void
     {
-        $admin = $this->admin();
+        $seksi = $this->seksi();
         $warga = $this->warga();
         $daftar = Pendaftaran::create($this->isianValid() + ['user_id' => $warga->id, 'status' => 'Baru']);
 
-        $this->actingAs($admin)->post("/admin/pkh/pendaftaran/{$daftar->id}/verifikasi")
+        $this->actingAs($seksi)->post("/admin/pkh/pendaftaran/{$daftar->id}/verifikasi")
             ->assertRedirect(route('admin.pkh.pendaftaran.show', $daftar));
 
         $this->assertSame('Diverifikasi', $daftar->fresh()->status);
@@ -170,11 +170,11 @@ class SmokePendaftaranPkhTest extends TestCase
 
     public function test_penolakan_menyimpan_status_dan_catatan(): void
     {
-        $admin = $this->admin();
+        $seksi = $this->seksi();
         $warga = $this->warga();
         $daftar = Pendaftaran::create($this->isianValid() + ['user_id' => $warga->id, 'status' => 'Baru']);
 
-        $this->actingAs($admin)->post("/admin/pkh/pendaftaran/{$daftar->id}/tolak", [
+        $this->actingAs($seksi)->post("/admin/pkh/pendaftaran/{$daftar->id}/tolak", [
             'catatan_admin' => 'Data tidak sesuai verifikasi lapangan.',
         ])->assertRedirect(route('admin.pkh.pendaftaran.show', $daftar));
 
@@ -186,16 +186,16 @@ class SmokePendaftaranPkhTest extends TestCase
 
     public function test_penilaian_calon_menampilkan_acuan_dan_foto_pendaftaran(): void
     {
-        $admin = $this->admin();
+        $seksi = $this->seksi();
         $warga = $this->warga();
 
         $this->actingAs($warga)->post('/pendaftaran-pkh', $this->isianValid() + $this->fotoValid());
         $daftar = Pendaftaran::where('user_id', $warga->id)->firstOrFail();
 
-        $this->actingAs($admin)->post("/admin/pkh/pendaftaran/{$daftar->id}/verifikasi");
+        $this->actingAs($seksi)->post("/admin/pkh/pendaftaran/{$daftar->id}/verifikasi");
         $alt = Alternatif::where('user_id', $warga->id)->firstOrFail();
 
-        $this->actingAs($admin)->get("/admin/pkh/penilaian/{$alt->id}/nilai")->assertOk()
+        $this->actingAs($seksi)->get("/admin/pkh/penilaian/{$alt->id}/nilai")->assertOk()
             ->assertSee('Acuan Data Pendaftaran')
             ->assertSee($daftar->kondisi_rumah)
             ->assertSee("/admin/pkh/pendaftaran/{$daftar->id}/foto/foto_depan");

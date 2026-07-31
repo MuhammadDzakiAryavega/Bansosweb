@@ -7,6 +7,7 @@ use App\Models\Alternatif;
 use App\Models\Pendaftaran;
 use App\Models\SubKriteria;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class PkhController extends Controller
 {
@@ -62,40 +63,33 @@ class PkhController extends Controller
         ],
     ];
 
-    /** Halaman kelola satu kriteria PKH beserta sub-kriterianya. */
-    public function show(string $kriteria)
+    /**
+     * Halaman kelola kriteria: seluruh kriteria C1–C5 beserta sub-kriterianya
+     * disatukan dalam satu halaman (satu menu, satu proses bagi petugas seksi).
+     */
+    public function kriteria()
     {
-        abort_unless(array_key_exists($kriteria, self::KRITERIA), 404);
-
         return view('admin.kelola_pkh.kriteria', [
-            'aktif'        => $kriteria,
-            'kriteria'     => self::KRITERIA[$kriteria],
-            'daftar'       => self::KRITERIA,
-            'subKriteria'  => SubKriteria::where('kriteria', $kriteria)
-                ->orderByDesc('nilai')
+            'daftar'      => self::KRITERIA,
+            'subKriteria' => SubKriteria::orderByDesc('nilai')
                 ->orderBy('nama')
-                ->get(),
+                ->get()
+                ->groupBy('kriteria'),
         ]);
     }
 
     public function storeSub(Request $request, string $kriteria)
     {
-        abort_unless(array_key_exists($kriteria, self::KRITERIA), 404);
+        SubKriteria::create(['kriteria' => $kriteria] + $this->validasiSub($request, $kriteria));
 
-        SubKriteria::create(['kriteria' => $kriteria] + $this->validasiSub($request));
-
-        return redirect()
-            ->route('admin.pkh.kriteria', $kriteria)
-            ->with('success', 'Sub-kriteria berhasil ditambahkan.');
+        return $this->kembaliKeKriteria($kriteria, 'Sub-kriteria berhasil ditambahkan.');
     }
 
     public function updateSub(Request $request, SubKriteria $sub)
     {
-        $sub->update($this->validasiSub($request));
+        $sub->update($this->validasiSub($request, $sub->kriteria));
 
-        return redirect()
-            ->route('admin.pkh.kriteria', $sub->kriteria)
-            ->with('success', 'Sub-kriteria berhasil diperbarui.');
+        return $this->kembaliKeKriteria($sub->kriteria, 'Sub-kriteria berhasil diperbarui.');
     }
 
     public function destroySub(SubKriteria $sub)
@@ -103,9 +97,15 @@ class PkhController extends Controller
         $kriteria = $sub->kriteria;
         $sub->delete();
 
+        return $this->kembaliKeKriteria($kriteria, 'Sub-kriteria berhasil dihapus.');
+    }
+
+    /** Kembali ke halaman kriteria, tepat pada bagian kriteria yang baru diubah. */
+    private function kembaliKeKriteria(string $kriteria, string $pesan)
+    {
         return redirect()
-            ->route('admin.pkh.kriteria', $kriteria)
-            ->with('success', 'Sub-kriteria berhasil dihapus.');
+            ->to(route('admin.pkh.kriteria') . '#' . $kriteria)
+            ->with('success', $pesan);
     }
 
     /** Halaman hasil akhir: perhitungan & perankingan SAW. */
@@ -181,9 +181,13 @@ class PkhController extends Controller
         ]);
     }
 
-    private function validasiSub(Request $request): array
+    /**
+     * Karena semua kriteria berbagi satu halaman, galat divalidasi ke kantong
+     * pesan miliknya sendiri agar hanya muncul pada kriteria yang bersangkutan.
+     */
+    private function validasiSub(Request $request, string $kriteria): array
     {
-        return $request->validate([
+        return Validator::make($request->all(), [
             'nama'  => ['required', 'string', 'max:120'],
             'nilai' => ['required', 'integer', 'min:1', 'max:100'],
         ], [
@@ -193,6 +197,12 @@ class PkhController extends Controller
             'nilai.integer'  => 'Nilai harus berupa angka bulat.',
             'nilai.min'      => 'Nilai minimal 1.',
             'nilai.max'      => 'Nilai maksimal 100.',
-        ]);
+        ])->validateWithBag(self::bagKriteria($kriteria));
+    }
+
+    /** Nama kantong pesan galat untuk satu kriteria. */
+    public static function bagKriteria(string $kriteria): string
+    {
+        return 'sub_' . str_replace('-', '_', $kriteria);
     }
 }
