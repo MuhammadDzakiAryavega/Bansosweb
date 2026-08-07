@@ -1,16 +1,25 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Alternatif;
 use App\Models\Pendaftaran;
 use App\Models\SubKriteria;
+use App\Support\XlsxWriter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
-class PkhController extends Controller
+class KelolaPkhController extends Controller
 {
+    /**
+     * Ambang batas kelayakan penerima PKH.
+     *
+     * Calon dengan skor preferensi V di bawah nilai ini dinyatakan tidak
+     * menerima bantuan, sekalipun peringkatnya masih tercantum pada hasil akhir.
+     */
+    public const AMBANG_KELAYAKAN = 0.65;
+
     /**
      * Kriteria penilaian PKH untuk metode SAW.
      *
@@ -111,14 +120,178 @@ class PkhController extends Controller
     /** Halaman hasil akhir: perhitungan & perankingan SAW. */
     public function hasil(Request $request)
     {
+        $desa = $this->desaTerpilih($request);
+
+        return view('admin.kelola_pkh.hasil', $this->perankingan($desa) + [
+            'kriteria'  => self::KRITERIA,
+            'ambang'    => self::AMBANG_KELAYAKAN,
+            'desaList'  => Pendaftaran::DESA,
+            'desaAktif' => $desa,
+        ]);
+    }
+
+    /**
+     * Unduh laporan hasil akhir sebagai berkas Excel (.xlsx).
+     *
+     * Isi laporan mengikuti penyaring desa yang sedang aktif pada halaman hasil
+     * akhir, lengkap dengan keputusan layak/tidak layak terhadap ambang batas.
+     */
+    public function laporan(Request $request)
+    {
+        $desa     = $this->desaTerpilih($request);
+        $kriteria = self::KRITERIA;
+        $ambang   = self::AMBANG_KELAYAKAN;
+
+        ['hasil' => $hasil, 'belum' => $belum, 'maks' => $maks] = $this->perankingan($desa);
+
+        $wilayah   = $desa ? 'Desa ' . $desa : 'Semua Desa (gabungan)';
+        $jmlLayak  = $hasil->where('layak', true)->count();
+        $kolomAkhir = 4 + count($kriteria) + 3; // identitas + kriteria + skor, status, keterangan
+
+        $x = new XlsxWriter('Hasil Akhir SAW');
+        $x->lebarKolom(array_merge([10, 30, 22, 20], array_fill(0, count($kriteria), 11), [12, 16, 38]));
+
+        // ---------- Kepala laporan ----------
+        $x->tulis([['LAPORAN HASIL AKHIR SELEKSI PENERIMA PKH', XlsxWriter::JUDUL]])->gabungBarisTerakhir($kolomAkhir);
+        $x->tulis([['Metode Simple Additive Weighting (SAW) — Portal PKH Kecamatan Teramang Jaya', XlsxWriter::SUBJUDUL]])
+            ->gabungBarisTerakhir($kolomAkhir);
+        $x->tulis();
+
+        $x->tulis([['Wilayah', XlsxWriter::LABEL], $wilayah]);
+        $x->tulis([['Tanggal cetak', XlsxWriter::LABEL], now()->translatedFormat('d F Y, H:i') . ' WIB']);
+        $x->tulis([
+            ['Ambang kelayakan', XlsxWriter::LABEL],
+            'Skor V < ' . number_format($ambang, 2, ',', '.') . ' dinyatakan TIDAK menerima PKH',
+        ]);
+        $x->tulis([['Calon dinilai lengkap', XlsxWriter::LABEL], $hasil->count() . ' orang']);
+        $x->tulis([
+            ['Hasil keputusan', XlsxWriter::LABEL],
+            $jmlLayak . ' orang layak menerima, ' . ($hasil->count() - $jmlLayak) . ' orang tidak layak',
+        ]);
+        $x->tulis();
+
+        // ---------- Tabel perankingan ----------
+        $header = [
+            ['Peringkat', XlsxWriter::HEADER],
+            ['Nama Calon Penerima', XlsxWriter::HEADER],
+            ['NIK', XlsxWriter::HEADER],
+            ['Desa', XlsxWriter::HEADER],
+        ];
+        foreach ($kriteria as $k) {
+            $header[] = [$k['kode'] . ' — ' . $k['label'], XlsxWriter::HEADER];
+        }
+        $header[] = ['Skor (V)', XlsxWriter::HEADER];
+        $header[] = ['Status', XlsxWriter::HEADER];
+        $header[] = ['Keterangan', XlsxWriter::HEADER];
+
+        $x->tulis($header);
+
+        foreach ($hasil as $i => $row) {
+            $sel = [
+                [$i + 1, XlsxWriter::ANGKA],
+                [$row['alt']->user->name ?? '(warga terhapus)', XlsxWriter::TEKS],
+                [(string) ($row['alt']->user->nik ?? '—'), XlsxWriter::ANGKA],
+                [$row['alt']->desa ?? '—', XlsxWriter::TEKS],
+            ];
+
+            foreach (array_keys($kriteria) as $slug) {
+                $sel[] = [round($row['norm'][$slug], 3), XlsxWriter::DESIMAL];
+            }
+
+            $sel[] = [round($row['skor'], 4), XlsxWriter::SKOR];
+            $sel[] = $row['layak']
+                ? ['LAYAK', XlsxWriter::LAYAK]
+                : ['TIDAK LAYAK', XlsxWriter::TIDAK_LAYAK];
+            $sel[] = [
+                $row['layak']
+                    ? 'Menerima PKH (skor ≥ ' . number_format($ambang, 2, ',', '.') . ')'
+                    : 'Tidak menerima PKH (skor < ' . number_format($ambang, 2, ',', '.') . ')',
+                XlsxWriter::TEKS,
+            ];
+
+            $x->tulis($sel);
+        }
+
+        if ($hasil->isEmpty()) {
+            $x->tulis([['Belum ada calon yang dinilai lengkap pada cakupan ini.', XlsxWriter::TEKS]])
+                ->gabungBarisTerakhir($kolomAkhir);
+        }
+
+        // ---------- Matriks keputusan (nilai asli) ----------
+        $x->tulis();
+        $x->tulis([['MATRIKS KEPUTUSAN (nilai crisp sebelum normalisasi)', XlsxWriter::LABEL]])->gabungBarisTerakhir($kolomAkhir);
+
+        $headerMatriks = [['Nama Calon Penerima', XlsxWriter::HEADER]];
+        foreach ($kriteria as $k) {
+            $headerMatriks[] = [$k['kode'] . ' — ' . $k['label'], XlsxWriter::HEADER];
+        }
+        $x->tulis($headerMatriks);
+
+        foreach ($hasil as $row) {
+            $sel = [[$row['alt']->user->name ?? '(warga terhapus)', XlsxWriter::TEKS]];
+            foreach (array_keys($kriteria) as $slug) {
+                $sel[] = [(int) $row['nilai'][$slug], XlsxWriter::ANGKA];
+            }
+            $x->tulis($sel);
+        }
+
+        $selIdeal = [['Nilai ideal (pembagi normalisasi)', XlsxWriter::SOROT]];
+        foreach (array_keys($kriteria) as $slug) {
+            $selIdeal[] = [$maks[$slug], XlsxWriter::SOROT];
+        }
+        $x->tulis($selIdeal);
+
+        // ---------- Bobot kriteria ----------
+        $x->tulis();
+        $x->tulis([['BOBOT KRITERIA', XlsxWriter::LABEL]])->gabungBarisTerakhir($kolomAkhir);
+        $x->tulis([
+            ['Kode', XlsxWriter::HEADER],
+            ['Kriteria', XlsxWriter::HEADER],
+            ['Bobot', XlsxWriter::HEADER],
+            ['Jenis', XlsxWriter::HEADER],
+        ]);
+        foreach ($kriteria as $k) {
+            $x->tulis([
+                [$k['kode'], XlsxWriter::ANGKA],
+                [$k['label'], XlsxWriter::TEKS],
+                [$k['bobot'], XlsxWriter::DESIMAL],
+                [ucfirst($k['jenis']), XlsxWriter::ANGKA],
+            ]);
+        }
+
+        // ---------- Catatan penilaian yang belum lengkap ----------
+        if ($belum->isNotEmpty()) {
+            $x->tulis();
+            $x->tulis([[
+                'Catatan: ' . $belum->count() . ' calon belum dinilai lengkap sehingga tidak diikutkan dalam perankingan — '
+                    . $belum->map(fn ($r) => ($r['alt']->user->name ?? 'Tanpa nama') . ' (' . $r['terisi'] . '/' . count($kriteria) . ')')->join(', ') . '.',
+                XlsxWriter::LABEL,
+            ]])->gabungBarisTerakhir($kolomAkhir);
+        }
+
+        $namaBerkas = 'Laporan-Hasil-Akhir-PKH-'
+            . Str::slug($desa ?? 'Semua Desa') . '-'
+            . now()->format('Ymd-Hi') . '.xlsx';
+
+        $path = $x->simpan(storage_path('app/' . Str::random(16) . '.xlsx'));
+
+        return response()->download($path, $namaBerkas, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ])->deleteFileAfterSend();
+    }
+
+    /**
+     * Hitung perankingan SAW untuk satu cakupan desa.
+     *
+     * @return array{hasil: \Illuminate\Support\Collection, belum: \Illuminate\Support\Collection, maks: array<string,int>}
+     */
+    private function perankingan(?string $desa): array
+    {
         $kriteria = self::KRITERIA;
 
-        // Bila satu desa dipilih, normalisasi dihitung dalam desa itu saja
-        // (query difilter dulu, sehingga maks/min kolom hanya dari calon desa tsb).
-        $desa = $request->filled('desa') && in_array($request->desa, Pendaftaran::DESA, true)
-            ? $request->desa
-            : null;
-
+        // Penyaring desa hanya membatasi calon yang diperingkat; skor tiap calon
+        // tidak ikut berubah karena pembagi normalisasi berasal dari skala nilai
+        // (lihat $maks/$mins di bawah), bukan dari kumpulan calon yang tampil.
         $alternatif = Alternatif::with(['user', 'penilaian.subKriteria'])
             ->when($desa, fn ($q) => $q->where('desa', $desa))
             ->get();
@@ -137,13 +310,22 @@ class PkhController extends Controller
             }
         }
 
-        // Nilai maksimum & minimum tiap kolom kriteria untuk normalisasi.
+        // Pembagi normalisasi diambil dari skala penilaian yang ditetapkan pada
+        // Kelola Kriteria — nilai sub-kriteria tertinggi (ideal) dan terendah tiap
+        // kriteria — bukan dari nilai calon yang kebetulan terdaftar. Dengan acuan
+        // tetap ini skor bersifat absolut: seorang calon tidak otomatis bernilai
+        // 1,0000 hanya karena ia satu-satunya pembanding, dan skornya tidak
+        // berubah ketika calon lain ditambah, dihapus, atau disaring per desa.
+        $skala = SubKriteria::selectRaw('kriteria, MAX(nilai) AS nilai_maks, MIN(nilai) AS nilai_mins')
+            ->groupBy('kriteria')
+            ->get()
+            ->keyBy('kriteria');
+
         $maks = [];
         $mins = [];
         foreach (array_keys($kriteria) as $slug) {
-            $kolom = $lengkap->map(fn ($r) => $r['nilai'][$slug])->all();
-            $maks[$slug] = $kolom ? max($kolom) : 0;
-            $mins[$slug] = $kolom ? min($kolom) : 0;
+            $maks[$slug] = (int) ($skala[$slug]->nilai_maks ?? 0);
+            $mins[$slug] = (int) ($skala[$slug]->nilai_mins ?? 0);
         }
 
         // Normalisasi SAW + skor preferensi V = Σ (bobot × nilai ternormalisasi).
@@ -166,19 +348,28 @@ class PkhController extends Controller
                 'nilai' => $r['nilai'],
                 'norm'  => $norm,
                 'skor'  => $skor,
+                // Keputusan akhir: skor di bawah ambang tidak menerima bantuan.
+                // Pembulatan disamakan dengan angka yang ditampilkan agar skor
+                // seperti 0,64999 tidak terbaca lolos hanya karena galat pecahan.
+                'layak' => round($skor, 4) >= self::AMBANG_KELAYAKAN,
             ];
         })
             ->sortByDesc('skor')
             ->values();
 
-        return view('admin.kelola_pkh.hasil', [
-            'kriteria'  => $kriteria,
-            'hasil'     => $hasil,
-            'belum'     => $belum->sortBy(fn ($r) => $r['alt']->user->name ?? '')->values(),
-            'maks'      => $maks,
-            'desaList'  => Pendaftaran::DESA,
-            'desaAktif' => $desa,
-        ]);
+        return [
+            'hasil' => $hasil,
+            'belum' => $belum->sortBy(fn ($r) => $r['alt']->user->name ?? '')->values(),
+            'maks'  => $maks,
+        ];
+    }
+
+    /** Desa dari penyaring, hanya diterima bila terdaftar pada daftar desa resmi. */
+    private function desaTerpilih(Request $request): ?string
+    {
+        return $request->filled('desa') && in_array($request->desa, Pendaftaran::DESA, true)
+            ? $request->desa
+            : null;
     }
 
     /**

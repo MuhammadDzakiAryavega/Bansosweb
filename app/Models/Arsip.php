@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
@@ -24,6 +25,7 @@ class Arsip extends Model
     private const BULAN_ROMAWI = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
 
     protected $fillable = [
+        'user_id',
         'nomor_arsip',
         'tgl_dokumen',
         'judul_arsip',
@@ -43,6 +45,12 @@ class Arsip extends Model
             'tanggal_publikasi' => 'datetime',
             'lampiran_ukuran'   => 'integer',
         ];
+    }
+
+    /** Petugas yang mengunggah arsip ini. */
+    public function pencatat(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     /** Hanya arsip yang sudah dipublikasikan. */

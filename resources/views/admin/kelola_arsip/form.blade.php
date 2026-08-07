@@ -84,7 +84,7 @@
                             Judul Arsip <span class="text-[#C8102E]">*</span>
                         </label>
                         <input type="text" id="judul_arsip" name="judul_arsip" value="{{ $nilai('judul_arsip') }}"
-                               maxlength="255" placeholder="Contoh: Surat Undangan Rapat Koordinasi Penyaluran PKH Tahap III"
+                               maxlength="150" placeholder="Contoh: Surat Undangan Rapat Koordinasi Penyaluran PKH Tahap III"
                                class="w-full px-4 py-3 rounded-md border text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-1 transition @error('judul_arsip') {{ $inputErr }} @else {{ $inputOk }} @enderror">
                         @error('judul_arsip')
                             <p class="mt-2 text-xs text-[#C8102E]">{{ $message }}</p>

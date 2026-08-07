@@ -1,16 +1,16 @@
 <?php
 
-use App\Http\Controllers\Admin\ArsipController as AdminArsipController;
-use App\Http\Controllers\Admin\BeritaController as AdminBeritaController;
-use App\Http\Controllers\Admin\GaleriController as AdminGaleriController;
-use App\Http\Controllers\Admin\PendaftaranController as AdminPendaftaranController;
-use App\Http\Controllers\Admin\PengaduanController as AdminPengaduanController;
-use App\Http\Controllers\Admin\PkhController as AdminPkhController;
-use App\Http\Controllers\Admin\PkhPenilaianController as AdminPkhPenilaianController;
-use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BeritaController;
 use App\Http\Controllers\GaleriController;
+use App\Http\Controllers\KelolaArsipController;
+use App\Http\Controllers\KelolaBeritaController;
+use App\Http\Controllers\KelolaGaleriController;
+use App\Http\Controllers\KelolaPendaftaranController;
+use App\Http\Controllers\KelolaPengaduanController;
+use App\Http\Controllers\KelolaPkhController;
+use App\Http\Controllers\KelolaPkhPenilaianController;
+use App\Http\Controllers\KelolaUserController;
 use App\Http\Controllers\PendaftaranPkhController;
 use App\Http\Controllers\PengaduanController;
 use Illuminate\Support\Facades\Route;
@@ -83,78 +83,78 @@ Route::middleware(['auth', 'role:admin,seksi'])->prefix('admin')->name('admin.')
     /* ============ KEWENANGAN ADMINISTRATOR ============ */
     Route::middleware('role:admin')->group(function () {
         // Kelola berita
-        Route::get('/berita', [AdminBeritaController::class, 'index'])->name('berita.index');
-        Route::get('/berita/tambah', [AdminBeritaController::class, 'create'])->name('berita.create');
-        Route::post('/berita', [AdminBeritaController::class, 'store'])->name('berita.store');
-        Route::get('/berita/{berita}/ubah', [AdminBeritaController::class, 'edit'])->name('berita.edit');
-        Route::put('/berita/{berita}', [AdminBeritaController::class, 'update'])->name('berita.update');
-        Route::delete('/berita/{berita}', [AdminBeritaController::class, 'destroy'])->name('berita.destroy');
+        Route::get('/berita', [KelolaBeritaController::class, 'index'])->name('berita.index');
+        Route::get('/berita/tambah', [KelolaBeritaController::class, 'create'])->name('berita.create');
+        Route::post('/berita', [KelolaBeritaController::class, 'store'])->name('berita.store');
+        Route::get('/berita/{berita}/ubah', [KelolaBeritaController::class, 'edit'])->name('berita.edit');
+        Route::put('/berita/{berita}', [KelolaBeritaController::class, 'update'])->name('berita.update');
+        Route::delete('/berita/{berita}', [KelolaBeritaController::class, 'destroy'])->name('berita.destroy');
 
         // Kelola galeri
-        Route::get('/galeri', [AdminGaleriController::class, 'index'])->name('galeri.index');
-        Route::get('/galeri/tambah', [AdminGaleriController::class, 'create'])->name('galeri.create');
-        Route::post('/galeri', [AdminGaleriController::class, 'store'])->name('galeri.store');
-        Route::get('/galeri/{galeri}/ubah', [AdminGaleriController::class, 'edit'])->name('galeri.edit');
-        Route::put('/galeri/{galeri}', [AdminGaleriController::class, 'update'])->name('galeri.update');
-        Route::delete('/galeri/{galeri}', [AdminGaleriController::class, 'destroy'])->name('galeri.destroy');
+        Route::get('/galeri', [KelolaGaleriController::class, 'index'])->name('galeri.index');
+        Route::get('/galeri/tambah', [KelolaGaleriController::class, 'create'])->name('galeri.create');
+        Route::post('/galeri', [KelolaGaleriController::class, 'store'])->name('galeri.store');
+        Route::get('/galeri/{galeri}/ubah', [KelolaGaleriController::class, 'edit'])->name('galeri.edit');
+        Route::put('/galeri/{galeri}', [KelolaGaleriController::class, 'update'])->name('galeri.update');
+        Route::delete('/galeri/{galeri}', [KelolaGaleriController::class, 'destroy'])->name('galeri.destroy');
 
         // Kelola kriteria PKH — data master C1–C5 beserta sub-kriterianya,
         // seluruhnya pada satu halaman. Seksi memakai nilainya saat menilai,
         // tetapi yang berwenang mengubah master hanyalah administrator.
         Route::prefix('pkh')->name('pkh.')->group(function () {
-            Route::get('/kriteria', [AdminPkhController::class, 'kriteria'])->name('kriteria');
+            Route::get('/kriteria', [KelolaPkhController::class, 'kriteria'])->name('kriteria');
 
-            Route::post('/{kriteria}/sub', [AdminPkhController::class, 'storeSub'])
-                ->whereIn('kriteria', array_keys(AdminPkhController::KRITERIA))->name('sub.store');
-            Route::put('/sub/{sub}', [AdminPkhController::class, 'updateSub'])->name('sub.update');
-            Route::delete('/sub/{sub}', [AdminPkhController::class, 'destroySub'])->name('sub.destroy');
+            Route::post('/{kriteria}/sub', [KelolaPkhController::class, 'storeSub'])
+                ->whereIn('kriteria', array_keys(KelolaPkhController::KRITERIA))->name('sub.store');
+            Route::put('/sub/{sub}', [KelolaPkhController::class, 'updateSub'])->name('sub.update');
+            Route::delete('/sub/{sub}', [KelolaPkhController::class, 'destroySub'])->name('sub.destroy');
         });
 
         // Kelola pengguna (termasuk membuat akun seksi)
-        Route::get('/pengguna', [AdminUserController::class, 'index'])->name('user.index');
-        Route::get('/pengguna/tambah', [AdminUserController::class, 'create'])->name('user.create');
-        Route::post('/pengguna', [AdminUserController::class, 'store'])->name('user.store');
-        Route::get('/pengguna/{user}/ubah', [AdminUserController::class, 'edit'])->name('user.edit');
-        Route::put('/pengguna/{user}', [AdminUserController::class, 'update'])->name('user.update');
-        Route::delete('/pengguna/{user}', [AdminUserController::class, 'destroy'])->name('user.destroy');
+        Route::get('/pengguna', [KelolaUserController::class, 'index'])->name('user.index');
+        Route::get('/pengguna/tambah', [KelolaUserController::class, 'create'])->name('user.create');
+        Route::post('/pengguna', [KelolaUserController::class, 'store'])->name('user.store');
+        Route::get('/pengguna/{user}/ubah', [KelolaUserController::class, 'edit'])->name('user.edit');
+        Route::put('/pengguna/{user}', [KelolaUserController::class, 'update'])->name('user.update');
+        Route::delete('/pengguna/{user}', [KelolaUserController::class, 'destroy'])->name('user.destroy');
     });
 
     /* ============ KEWENANGAN SEKSI ============ */
     Route::middleware('role:seksi')->group(function () {
         // Kelola arsip (dokumen internal)
-        Route::get('/arsip', [AdminArsipController::class, 'index'])->name('arsip.index');
-        Route::get('/arsip/tambah', [AdminArsipController::class, 'create'])->name('arsip.create');
-        Route::post('/arsip', [AdminArsipController::class, 'store'])->name('arsip.store');
-        Route::get('/arsip/{arsip}/ubah', [AdminArsipController::class, 'edit'])->name('arsip.edit');
-        Route::get('/arsip/{arsip}/lampiran', [AdminArsipController::class, 'unduh'])->name('arsip.unduh');
-        Route::put('/arsip/{arsip}', [AdminArsipController::class, 'update'])->name('arsip.update');
-        Route::delete('/arsip/{arsip}', [AdminArsipController::class, 'destroy'])->name('arsip.destroy');
+        Route::get('/arsip', [KelolaArsipController::class, 'index'])->name('arsip.index');
+        Route::get('/arsip/tambah', [KelolaArsipController::class, 'create'])->name('arsip.create');
+        Route::post('/arsip', [KelolaArsipController::class, 'store'])->name('arsip.store');
+        Route::get('/arsip/{arsip}/ubah', [KelolaArsipController::class, 'edit'])->name('arsip.edit');
+        Route::get('/arsip/{arsip}/lampiran', [KelolaArsipController::class, 'unduh'])->name('arsip.unduh');
+        Route::put('/arsip/{arsip}', [KelolaArsipController::class, 'update'])->name('arsip.update');
+        Route::delete('/arsip/{arsip}', [KelolaArsipController::class, 'destroy'])->name('arsip.destroy');
 
         // Kelola PKH — Sistem Pendukung Keputusan metode SAW
         Route::prefix('pkh')->name('pkh.')->group(function () {
             // Pendaftaran calon (pengajuan warga yang ditinjau seksi)
-            Route::get('/pendaftaran', [AdminPendaftaranController::class, 'index'])->name('pendaftaran.index');
-            Route::get('/pendaftaran/{pendaftaran}', [AdminPendaftaranController::class, 'show'])->name('pendaftaran.show');
-            Route::get('/pendaftaran/{pendaftaran}/foto/{jenis}', [AdminPendaftaranController::class, 'foto'])->name('pendaftaran.foto');
-            Route::post('/pendaftaran/{pendaftaran}/verifikasi', [AdminPendaftaranController::class, 'verifikasi'])->name('pendaftaran.verifikasi');
-            Route::post('/pendaftaran/{pendaftaran}/tolak', [AdminPendaftaranController::class, 'tolak'])->name('pendaftaran.tolak');
-            Route::delete('/pendaftaran/{pendaftaran}', [AdminPendaftaranController::class, 'destroy'])->name('pendaftaran.destroy');
+            Route::get('/pendaftaran', [KelolaPendaftaranController::class, 'index'])->name('pendaftaran.index');
+            Route::get('/pendaftaran/{pendaftaran}', [KelolaPendaftaranController::class, 'show'])->name('pendaftaran.show');
+            Route::get('/pendaftaran/{pendaftaran}/foto/{jenis}', [KelolaPendaftaranController::class, 'foto'])->name('pendaftaran.foto');
+            Route::post('/pendaftaran/{pendaftaran}/verifikasi', [KelolaPendaftaranController::class, 'verifikasi'])->name('pendaftaran.verifikasi');
+            Route::post('/pendaftaran/{pendaftaran}/tolak', [KelolaPendaftaranController::class, 'tolak'])->name('pendaftaran.tolak');
+            Route::delete('/pendaftaran/{pendaftaran}', [KelolaPendaftaranController::class, 'destroy'])->name('pendaftaran.destroy');
 
-            // Penilaian calon penerima (alternatif = warga terdaftar)
-            Route::get('/penilaian', [AdminPkhPenilaianController::class, 'index'])->name('penilaian.index');
-            Route::post('/penilaian', [AdminPkhPenilaianController::class, 'store'])->name('penilaian.store');
-            Route::get('/penilaian/{alternatif}/nilai', [AdminPkhPenilaianController::class, 'edit'])->name('penilaian.edit');
-            Route::put('/penilaian/{alternatif}', [AdminPkhPenilaianController::class, 'update'])->name('penilaian.update');
-            Route::delete('/penilaian/{alternatif}', [AdminPkhPenilaianController::class, 'destroy'])->name('penilaian.destroy');
+            // Penilaian calon penerima (alternatif lahir dari verifikasi pendaftaran)
+            Route::get('/penilaian', [KelolaPkhPenilaianController::class, 'index'])->name('penilaian.index');
+            Route::get('/penilaian/{alternatif}/nilai', [KelolaPkhPenilaianController::class, 'edit'])->name('penilaian.edit');
+            Route::put('/penilaian/{alternatif}', [KelolaPkhPenilaianController::class, 'update'])->name('penilaian.update');
+            Route::delete('/penilaian/{alternatif}', [KelolaPkhPenilaianController::class, 'destroy'])->name('penilaian.destroy');
 
             // Hasil akhir perankingan SAW
-            Route::get('/hasil-akhir', [AdminPkhController::class, 'hasil'])->name('hasil');
+            Route::get('/hasil-akhir', [KelolaPkhController::class, 'hasil'])->name('hasil');
+            Route::get('/hasil-akhir/laporan', [KelolaPkhController::class, 'laporan'])->name('hasil.laporan');
         });
 
         // Kelola pengaduan
-        Route::get('/pengaduan', [AdminPengaduanController::class, 'index'])->name('pengaduan.index');
-        Route::get('/pengaduan/{pengaduan}', [AdminPengaduanController::class, 'show'])->name('pengaduan.show');
-        Route::patch('/pengaduan/{pengaduan}/status', [AdminPengaduanController::class, 'updateStatus'])->name('pengaduan.updateStatus');
-        Route::delete('/pengaduan/{pengaduan}', [AdminPengaduanController::class, 'destroy'])->name('pengaduan.destroy');
+        Route::get('/pengaduan', [KelolaPengaduanController::class, 'index'])->name('pengaduan.index');
+        Route::get('/pengaduan/{pengaduan}', [KelolaPengaduanController::class, 'show'])->name('pengaduan.show');
+        Route::patch('/pengaduan/{pengaduan}/status', [KelolaPengaduanController::class, 'updateStatus'])->name('pengaduan.updateStatus');
+        Route::delete('/pengaduan/{pengaduan}', [KelolaPengaduanController::class, 'destroy'])->name('pengaduan.destroy');
     });
 });

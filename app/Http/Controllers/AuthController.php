@@ -22,20 +22,21 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $data = $request->validate([
-            'name'     => ['required', 'string', 'max:255'],
+            'name'     => ['required', 'string', 'max:100'],
             'nik'      => ['required', 'digits:16', 'unique:users,nik'],
-            'email'    => ['required', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'confirmed', 'min:8'],
+            'email'    => ['required', 'email', 'max:100', 'unique:users,email'],
+            'password' => ['required', 'confirmed', 'min:8', 'max:20'],
         ], [
             'required'        => ':attribute wajib diisi.',
-            'name.max'        => 'Nama lengkap maksimal 255 karakter.',
+            'name.max'        => 'Nama lengkap maksimal 100 karakter.',
             'nik.digits'      => 'NIK harus terdiri dari 16 digit angka.',
             'nik.unique'      => 'NIK ini sudah terdaftar pada portal.',
             'email.email'     => 'Format alamat surel tidak valid.',
-            'email.max'       => 'Alamat surel maksimal 255 karakter.',
+            'email.max'       => 'Alamat surel maksimal 100 karakter.',
             'email.unique'    => 'Alamat surel ini sudah terdaftar pada portal.',
             'password.confirmed' => 'Konfirmasi kata sandi tidak sama.',
             'password.min'    => 'Kata sandi minimal 8 karakter.',
+            'password.max'    => 'Kata sandi maksimal 20 karakter.',
         ], [
             'name'     => 'Nama lengkap',
             'nik'      => 'NIK',
@@ -252,10 +253,10 @@ class AuthController extends Controller
         }
 
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:100'],
         ], [
             'name.required' => 'Nama lengkap wajib diisi.',
-            'name.max'      => 'Nama lengkap maksimal 255 karakter.',
+            'name.max'      => 'Nama lengkap maksimal 100 karakter.',
         ]);
 
         $request->user()->update($data);
@@ -271,13 +272,14 @@ class AuthController extends Controller
 
         $data = $request->validate([
             'current_password' => ['required', 'current_password'],
-            'password'          => ['required', 'confirmed', 'min:8'],
+            'password'          => ['required', 'confirmed', 'min:8', 'max:20'],
         ], [
             'current_password.required'         => 'Kata sandi saat ini wajib diisi.',
             'current_password.current_password' => 'Kata sandi saat ini tidak sesuai.',
             'password.required'                 => 'Kata sandi baru wajib diisi.',
             'password.confirmed'                => 'Konfirmasi kata sandi baru tidak sama.',
             'password.min'                      => 'Kata sandi baru minimal 8 karakter.',
+            'password.max'                      => 'Kata sandi baru maksimal 20 karakter.',
         ]);
 
         $request->user()->update([

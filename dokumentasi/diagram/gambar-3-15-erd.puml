@@ -1,0 +1,138 @@
+@startuml
+' ERD Sistem (Gambar 3. 14) — gaya mengikuti diagram yang sudah dipakai di laporan.
+' Render: java -jar plantuml.jar gambar-3-15-erd.puml
+
+' Perutean siku memerlukan Graphviz (dot); tanpa itu garis akan melengkung.
+skinparam linetype ortho
+skinparam dpi 192
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 13
+skinparam roundCorner 0
+skinparam class {
+    BackgroundColor #FFFFFF
+    HeaderBackgroundColor #F0F0F0
+    BorderColor #9A9A9A
+    FontColor #000000
+    FontStyle bold
+    AttributeFontColor #000000
+    AttributeFontSize 13
+    AttributeFontStyle plain
+}
+hide circle
+hide methods
+
+entity users {
+    id : bigint <<PK>>
+    --
+    name : string
+    nik : string <<UK>>
+    email : string <<UK>>
+    password : string
+    role : enum (user, admin, seksi)
+}
+
+entity pkh_pendaftaran {
+    id : bigint <<PK>>
+    --
+    user_id : bigint <<FK>>
+    nama : string
+    desa : string
+    penghasilan : string
+    jumlah_tanggungan : int
+    kondisi_rumah : string
+    status_pekerjaan : string
+    kepemilikan_aset : string
+    foto_ktp : string
+    foto_depan : string
+    foto_ruang_tamu : string
+    foto_belakang : string
+    foto_wc : string
+    status : enum (Baru, Diverifikasi, Ditolak)
+    catatan_admin : text
+}
+
+entity pkh_alternatif {
+    id : bigint <<PK>>
+    --
+    user_id : bigint <<FK>>
+    desa : string
+}
+
+entity pkh_penilaian {
+    id : bigint <<PK>>
+    --
+    alternatif_id : bigint <<FK>>
+    kriteria : string
+    sub_kriteria_id : bigint <<FK>>
+}
+
+entity pkh_sub_kriteria {
+    id : bigint <<PK>>
+    --
+    kriteria : string (slug C1-C5)
+    nama : string
+    nilai : int (skala crisp 1-5)
+}
+
+entity pengaduans {
+    id_pengaduan : bigint <<PK>>
+    --
+    user_id : bigint <<FK>>
+    judul_pengaduan : string
+    isi_pengaduan : text
+    status_pengaduan : string
+    url_lampiran : string
+}
+
+entity beritas {
+    id_berita : bigint <<PK>>
+    --
+    user_id : bigint <<FK>>
+    judul_berita : string
+    slug : string <<UK>>
+    kategori : string
+    status_berita : string
+    isi_artikel : text
+}
+
+entity galeris {
+    id_galeri : bigint <<PK>>
+    --
+    user_id : bigint <<FK>>
+    judul_kegiatan : string
+    slug : string <<UK>>
+    tgl_pelaksanaan : date
+}
+
+entity galeri_fotos {
+    id_foto : bigint <<PK>>
+    --
+    galeri_id : bigint <<FK>>
+    path : string
+    urutan : int
+}
+
+entity arsips {
+    id_arsip : bigint <<PK>>
+    --
+    user_id : bigint <<FK>>
+    nomor_arsip : string
+    judul_arsip : string
+    klasifikasi : string
+    lampiran : string
+    status_publikasi : string
+}
+
+users ||--o{ pkh_pendaftaran : mengajukan
+users ||--o| pkh_alternatif : "menjadi calon"
+users ||--o{ pengaduans : mengirim
+users ||--o{ beritas : menulis
+users ||--o{ galeris : mendokumentasikan
+users ||--o{ arsips : mengunggah
+pkh_alternatif ||--o{ pkh_penilaian : "dinilai pada"
+pkh_sub_kriteria ||--o{ pkh_penilaian : "dipilih sebagai"
+galeris ||--o{ galeri_fotos : memuat
+
+@enduml

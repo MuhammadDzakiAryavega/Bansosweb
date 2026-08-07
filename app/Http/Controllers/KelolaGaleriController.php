@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Galeri;
 use App\Models\GaleriFoto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-class GaleriController extends Controller
+class KelolaGaleriController extends Controller
 {
     public function index(Request $request)
     {
@@ -57,6 +56,7 @@ class GaleriController extends Controller
     {
         $data = $this->validasi($request);
 
+        $data['user_id'] = $request->user()->id; // petugas yang mencatat
         $data['slug'] = Galeri::buatSlug($data['judul_kegiatan']);
 
         $galeri = Galeri::create($data);
@@ -109,7 +109,7 @@ class GaleriController extends Controller
     private function validasi(Request $request): array
     {
         $data = $request->validate([
-            'judul_kegiatan'    => ['required', 'string', 'max:255'],
+            'judul_kegiatan'    => ['required', 'string', 'max:150'],
             'tgl_pelaksanaan'   => ['required', 'date'],
             'deskripsi_singkat' => ['required', 'string', 'max:1000'],
             'foto'              => ['nullable', 'array', 'max:20'],
@@ -118,7 +118,7 @@ class GaleriController extends Controller
             'hapus_foto.*'      => ['integer'],
         ], [
             'required'                => ':attribute wajib diisi.',
-            'judul_kegiatan.max'      => 'Judul kegiatan maksimal 255 karakter.',
+            'judul_kegiatan.max'      => 'Judul kegiatan maksimal 150 karakter.',
             'tgl_pelaksanaan.date'    => 'Tanggal pelaksanaan tidak valid.',
             'deskripsi_singkat.max'   => 'Deskripsi singkat maksimal 1000 karakter.',
             'foto.max'                => 'Maksimal 20 foto untuk sekali unggah.',

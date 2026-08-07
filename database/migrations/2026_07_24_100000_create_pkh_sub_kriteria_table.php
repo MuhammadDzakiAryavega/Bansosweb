@@ -10,7 +10,7 @@ return new class extends Migration
     {
         // Himpunan/sub-kriteria tiap kriteria SAW: label kategori + nilai crisp-nya.
         // Kriteria induk (C1..C5) beserta bobot & jenisnya disimpan sebagai konstanta
-        // pada App\Http\Controllers\Admin\PkhController, jadi cukup dirujuk lewat slug.
+        // pada App\Http\Controllers\KelolaPkhController, jadi cukup dirujuk lewat slug.
         Schema::create('pkh_sub_kriteria', function (Blueprint $table) {
             $table->id();
             $table->string('kriteria', 40);       // slug: penghasilan, jumlah-tanggungan, ...

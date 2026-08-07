@@ -206,7 +206,7 @@
                                     <div>
                                         <label for="new_password" class="block text-sm font-semibold text-slate-700 mb-2">Kata Sandi Baru</label>
                                         <input type="password" id="new_password" name="password" autocomplete="new-password"
-                                               placeholder="Minimal 8 karakter"
+                                               maxlength="20" placeholder="8 sampai 20 karakter"
                                                class="{{ $inputBase }} {{ $errors->has('password') ? $inputErr : $inputOk }}">
                                         @error('password')
                                             <p class="text-xs text-[#C8102E] mt-2">{{ $message }}</p>
@@ -216,7 +216,7 @@
                                     <div>
                                         <label for="password_confirmation" class="block text-sm font-semibold text-slate-700 mb-2">Konfirmasi Kata Sandi Baru</label>
                                         <input type="password" id="password_confirmation" name="password_confirmation" autocomplete="new-password"
-                                               placeholder="Ulangi kata sandi baru"
+                                               maxlength="20" placeholder="Ulangi kata sandi baru"
                                                class="{{ $inputBase }} {{ $inputOk }}">
                                     </div>
                                 </div>

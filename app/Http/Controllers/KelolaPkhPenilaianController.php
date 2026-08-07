@@ -1,17 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Alternatif;
 use App\Models\Pendaftaran;
 use App\Models\Penilaian;
 use App\Models\SubKriteria;
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
-class PkhPenilaianController extends Controller
+class KelolaPkhPenilaianController extends Controller
 {
     /** Daftar calon penerima (alternatif) beserta kelengkapan penilaiannya. */
     public function index(Request $request)
@@ -26,45 +23,12 @@ class PkhPenilaianController extends Controller
             ->sortBy(fn ($a) => $a->user->name ?? '')
             ->values();
 
-        // Warga yang belum menjadi calon (lintas desa), untuk pilihan penambahan.
-        $sudahJadiCalon = $semua->pluck('user_id')->all();
-        $wargaTersedia = User::where('role', 'user')
-            ->when($sudahJadiCalon, fn ($q) => $q->whereNotIn('id', $sudahJadiCalon))
-            ->orderBy('name')
-            ->get();
-
         return view('admin.kelola_pkh.penilaian', [
-            'alternatif'    => $alternatif,
-            'wargaTersedia' => $wargaTersedia,
-            'kriteria'      => PkhController::KRITERIA,
-            'desaList'      => Pendaftaran::DESA,
-            'desaAktif'     => $desa,
+            'alternatif' => $alternatif,
+            'kriteria'   => KelolaPkhController::KRITERIA,
+            'desaList'   => Pendaftaran::DESA,
+            'desaAktif'  => $desa,
         ]);
-    }
-
-    /** Daftarkan seorang warga sebagai calon penerima. */
-    public function store(Request $request)
-    {
-        $data = $request->validate([
-            'user_id' => [
-                'required', 'integer',
-                Rule::exists('users', 'id')->where('role', 'user'),
-                Rule::unique('pkh_alternatif', 'user_id'),
-            ],
-            'desa' => ['required', Rule::in(Pendaftaran::DESA)],
-        ], [
-            'user_id.required' => 'Pilih warga terlebih dahulu.',
-            'user_id.exists'   => 'Warga yang dipilih tidak valid.',
-            'user_id.unique'   => 'Warga ini sudah terdaftar sebagai calon penerima.',
-            'desa.required'    => 'Pilih desa calon terlebih dahulu.',
-            'desa.in'          => 'Desa yang dipilih tidak valid.',
-        ]);
-
-        Alternatif::create(['user_id' => $data['user_id'], 'desa' => $data['desa']]);
-
-        return redirect()
-            ->route('admin.pkh.penilaian.index')
-            ->with('success', 'Calon penerima berhasil ditambahkan.');
     }
 
     /** Formulir penilaian: memilih sub-kriteria tiap kriteria untuk satu calon. */
@@ -79,7 +43,7 @@ class PkhPenilaianController extends Controller
 
         return view('admin.kelola_pkh.penilaian_nilai', [
             'alternatif'     => $alternatif,
-            'kriteria'       => PkhController::KRITERIA,
+            'kriteria'       => KelolaPkhController::KRITERIA,
             'pilihan'        => $alternatif->penilaian->pluck('sub_kriteria_id', 'kriteria')->all(),
             'subPerKriteria' => SubKriteria::orderByDesc('nilai')->orderBy('nama')->get()->groupBy('kriteria'),
             'pendaftaran'    => $pendaftaran,
@@ -91,7 +55,7 @@ class PkhPenilaianController extends Controller
     {
         $pilihan = (array) $request->input('sub', []);
 
-        foreach (array_keys(PkhController::KRITERIA) as $slug) {
+        foreach (array_keys(KelolaPkhController::KRITERIA) as $slug) {
             $subId = $pilihan[$slug] ?? null;
 
             if (blank($subId)) {

@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Http\Controllers\Admin\PkhController;
+use App\Http\Controllers\KelolaPkhController;
 use App\Models\Alternatif;
 use App\Models\Pendaftaran;
 use App\Models\Penilaian;
@@ -64,7 +64,7 @@ class PkhDemoSeeder extends Seeder
             }
         }
 
-        $kriteriaSlugs = array_keys(PkhController::KRITERIA); // C1..C5 berurutan
+        $kriteriaSlugs = array_keys(KelolaPkhController::KRITERIA); // C1..C5 berurutan
 
         /* 3) Calon penerima + penilaian lengkap -------------------------- */
         // [nama, nik, desa, penghasilan, tanggungan, rumah, pekerjaan, aset]

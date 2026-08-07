@@ -11,10 +11,10 @@ return new class extends Migration
         // Bukti kondisi rumah: 4 foto (depan, belakang, ruang tamu, WC).
         // Disimpan pada disk privat; hanya dapat dilihat lewat rute admin.
         Schema::table('pkh_pendaftaran', function (Blueprint $table) {
-            $table->string('foto_depan')->nullable()->after('kepemilikan_aset');
-            $table->string('foto_belakang')->nullable()->after('foto_depan');
-            $table->string('foto_ruang_tamu')->nullable()->after('foto_belakang');
-            $table->string('foto_wc')->nullable()->after('foto_ruang_tamu');
+            $table->string('foto_depan', 150)->nullable()->after('kepemilikan_aset');
+            $table->string('foto_belakang', 150)->nullable()->after('foto_depan');
+            $table->string('foto_ruang_tamu', 150)->nullable()->after('foto_belakang');
+            $table->string('foto_wc', 150)->nullable()->after('foto_ruang_tamu');
         });
     }
 

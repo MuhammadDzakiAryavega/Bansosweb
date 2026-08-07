@@ -41,7 +41,7 @@
                             Nama Lengkap <span class="text-[#C8102E]">*</span>
                         </label>
                         <input type="text" id="name" name="name" value="{{ $nilai('name') }}"
-                               maxlength="255" placeholder="Contoh: Siti Aminah"
+                               maxlength="100" placeholder="Contoh: Siti Aminah"
                                class="w-full px-4 py-3 rounded-md border text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-1 transition @error('name') border-rose-300 focus:border-[#C8102E] focus:ring-[#C8102E] @else border-slate-300 focus:border-[#14346B] focus:ring-[#14346B] @enderror">
                         @error('name')
                             <p class="mt-2 text-xs text-[#C8102E]">{{ $message }}</p>
@@ -68,7 +68,7 @@
                             Alamat Surel <span class="text-[#C8102E]">*</span>
                         </label>
                         <input type="email" id="email" name="email" value="{{ $nilai('email') }}"
-                               maxlength="255" placeholder="nama@contoh.com"
+                               maxlength="100" placeholder="nama@contoh.com"
                                class="w-full px-4 py-3 rounded-md border text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-1 transition @error('email') border-rose-300 focus:border-[#C8102E] focus:ring-[#C8102E] @else border-slate-300 focus:border-[#14346B] focus:ring-[#14346B] @enderror">
                         <p class="mt-2 text-xs text-slate-500 leading-relaxed">
                             Surel ini dipakai pengguna untuk masuk ke portal.
@@ -100,7 +100,7 @@
                             @unless (isset($user)) <span class="text-[#C8102E]">*</span> @endunless
                         </label>
                         <input type="password" id="password" name="password" autocomplete="new-password"
-                               placeholder="Minimal 8 karakter"
+                               maxlength="20" placeholder="8 sampai 20 karakter"
                                class="w-full px-4 py-3 rounded-md border text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-1 transition @error('password') border-rose-300 focus:border-[#C8102E] focus:ring-[#C8102E] @else border-slate-300 focus:border-[#14346B] focus:ring-[#14346B] @enderror">
                         @error('password')
                             <p class="mt-2 text-xs text-[#C8102E]">{{ $message }}</p>
@@ -113,7 +113,7 @@
                             @unless (isset($user)) <span class="text-[#C8102E]">*</span> @endunless
                         </label>
                         <input type="password" id="password_confirmation" name="password_confirmation" autocomplete="new-password"
-                               placeholder="Ulangi kata sandi"
+                               maxlength="20" placeholder="Ulangi kata sandi"
                                class="w-full px-4 py-3 rounded-md border border-slate-300 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#14346B] focus:ring-1 focus:ring-[#14346B] transition">
                     </div>
                 </div>

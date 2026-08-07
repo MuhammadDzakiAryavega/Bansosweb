@@ -32,6 +32,12 @@
             tentukan kategori penilaian beserta nilai crisp-nya (mis. semakin layak/miskin, nilainya semakin besar).
             Nilai inilah yang dipakai saat menilai calon penerima dan dihitung pada metode SAW.
         </p>
+        <p class="text-sm text-slate-500 mt-3 leading-relaxed max-w-2xl">
+            Nilai sub-kriteria tertinggi tiap kriteria menjadi <span class="font-semibold text-slate-700">nilai ideal</span>, yaitu pembagi
+            normalisasi SAW pada <a href="{{ route('admin.pkh.hasil') }}" class="font-semibold text-[#14346B] underline hover:no-underline">Hasil Akhir</a>.
+            Karena acuannya diambil dari sini dan bukan dari calon yang kebetulan terdaftar, skor calon tetap stabil walau jumlah calon berubah.
+            Gunakan skala yang konsisten antar kriteria (mis. 1–5 pada semua kriteria).
+        </p>
     </div>
 
     <!-- ================= DAFTAR KRITERIA ================= -->
@@ -39,7 +45,7 @@
         @foreach ($daftar as $slug => $kriteria)
             @php
                 $daftarSub = $subKriteria[$slug] ?? collect();
-                $bag       = \App\Http\Controllers\Admin\PkhController::bagKriteria($slug);
+                $bag       = \App\Http\Controllers\KelolaPkhController::bagKriteria($slug);
                 $galat     = $errors->getBag($bag);
             @endphp
 
@@ -65,6 +71,12 @@
                                 <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-md border bg-slate-50 text-slate-600 border-slate-200">
                                     <i class="fas fa-layer-group text-[10px]"></i> {{ $daftarSub->count() }} sub-kriteria
                                 </span>
+                                @if ($daftarSub->isNotEmpty())
+                                    <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-md border bg-amber-50 text-amber-700 border-amber-200"
+                                          title="Pembagi normalisasi SAW untuk kriteria ini">
+                                        <i class="fas fa-bullseye text-[10px]"></i> Nilai ideal {{ $daftarSub->max('nilai') }}
+                                    </span>
+                                @endif
                             </div>
 
                             <p class="mt-4 text-sm text-slate-600 leading-relaxed max-w-2xl">

@@ -8,65 +8,6 @@
 
     @php $jumlahKriteria = count($kriteria); @endphp
 
-    <!-- ================= TAMBAH CALON ================= -->
-    <section class="border border-slate-200 rounded-lg bg-white overflow-hidden mb-8">
-        <div class="px-6 py-6 lg:px-8">
-            <div class="flex items-start gap-4 mb-5">
-                <span class="w-11 h-11 rounded-md bg-[#14346B]/5 text-[#14346B] flex items-center justify-center flex-shrink-0">
-                    <i class="fas fa-user-plus"></i>
-                </span>
-                <div>
-                    <h2 class="text-lg font-bold text-[#0E2650]">Tambah Calon Penerima</h2>
-                    <p class="text-sm text-slate-500 mt-1 leading-relaxed">Pilih warga terdaftar untuk dinilai kelayakannya sebagai penerima PKH.</p>
-                </div>
-            </div>
-
-            @if ($wargaTersedia->isEmpty())
-                <p class="text-sm text-slate-500 border border-dashed border-slate-300 rounded-md px-4 py-3.5 bg-slate-50">
-                    <i class="fas fa-circle-info mr-1.5 text-slate-400"></i>
-                    Seluruh warga terdaftar sudah menjadi calon penerima, atau belum ada warga yang mendaftar di portal.
-                </p>
-            @else
-                <form method="POST" action="{{ route('admin.pkh.penilaian.store') }}"
-                      class="flex flex-col sm:flex-row gap-3">
-                    @csrf
-                    <div class="flex-1">
-                        <label for="user_id" class="sr-only">Warga</label>
-                        <select name="user_id" id="user_id" required
-                                class="w-full px-4 py-3 rounded-md border border-slate-300 text-sm text-slate-800 focus:outline-none focus:border-[#14346B] focus:ring-1 focus:ring-[#14346B] transition">
-                            <option value="">— Pilih warga —</option>
-                            @foreach ($wargaTersedia as $warga)
-                                <option value="{{ $warga->id }}" @selected(old('user_id') == $warga->id)>
-                                    {{ $warga->name }} — NIK {{ $warga->nik }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="sm:w-56">
-                        <label for="desa" class="sr-only">Desa calon</label>
-                        <select name="desa" id="desa" required
-                                class="w-full px-4 py-3 rounded-md border border-slate-300 text-sm text-slate-800 focus:outline-none focus:border-[#14346B] focus:ring-1 focus:ring-[#14346B] transition">
-                            <option value="">— Pilih desa —</option>
-                            @foreach ($desaList as $desaOpsi)
-                                <option value="{{ $desaOpsi }}" @selected(old('desa') === $desaOpsi)>{{ $desaOpsi }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <button type="submit"
-                            class="inline-flex items-center justify-center gap-2 bg-[#14346B] text-white px-6 py-3 rounded-md text-sm font-semibold hover:bg-[#0E2650] transition-colors flex-shrink-0">
-                        <i class="fas fa-plus text-xs"></i> Tambahkan
-                    </button>
-                </form>
-                @error('user_id')
-                    <p class="mt-3 text-sm text-[#C8102E] font-medium"><i class="fas fa-circle-exclamation mr-1"></i>{{ $message }}</p>
-                @enderror
-                @error('desa')
-                    <p class="mt-2 text-sm text-[#C8102E] font-medium"><i class="fas fa-circle-exclamation mr-1"></i>{{ $message }}</p>
-                @enderror
-            @endif
-        </div>
-    </section>
-
     <!-- ================= DAFTAR CALON ================= -->
     <div class="flex items-end justify-between gap-4 mb-6">
         <div>
@@ -169,7 +110,7 @@
                                     <i class="fas fa-users"></i>
                                 </span>
                                 <p class="font-semibold text-slate-800">Belum ada calon penerima</p>
-                                <p class="text-sm text-slate-500 mt-1">Tambahkan warga terdaftar melalui formulir di atas.</p>
+                                <p class="text-sm text-slate-500 mt-1">Calon penerima muncul otomatis setelah pengajuan warga diverifikasi pada menu Pendaftaran.</p>
                             </td>
                         </tr>
                     @endforelse

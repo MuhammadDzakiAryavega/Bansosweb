@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
@@ -12,6 +13,7 @@ class Galeri extends Model
     protected $primaryKey = 'id_galeri';
 
     protected $fillable = [
+        'user_id',
         'judul_kegiatan',
         'slug',
         'tgl_pelaksanaan',
@@ -23,6 +25,12 @@ class Galeri extends Model
         return [
             'tgl_pelaksanaan' => 'date',
         ];
+    }
+
+    /** Petugas yang mencatat kegiatan ini. */
+    public function pencatat(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     /** Foto dokumentasi kegiatan, urut sesuai urutan unggah. */

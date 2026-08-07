@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Berita;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-class BeritaController extends Controller
+class KelolaBeritaController extends Controller
 {
     public function index(Request $request)
     {
@@ -59,6 +58,7 @@ class BeritaController extends Controller
     {
         $data = $this->validasi($request);
 
+        $data['user_id'] = $request->user()->id; // petugas yang mencatat
         $data['slug'] = Berita::buatSlug($data['judul_berita']);
         $data['gambar_cover'] = $this->simpanCover($request);
         $data['tanggal_publikasi'] = $data['status_berita'] === 'Published' ? now() : null;
@@ -120,7 +120,7 @@ class BeritaController extends Controller
     private function validasi(Request $request): array
     {
         return $request->validate([
-            'judul_berita'  => ['required', 'string', 'max:255'],
+            'judul_berita'  => ['required', 'string', 'max:150'],
             'kategori'      => ['required', 'in:' . implode(',', Berita::KATEGORI_LIST)],
             'penulis'       => ['required', 'in:' . implode(',', Berita::PENULIS_LIST)],
             'status_berita' => ['required', 'in:' . implode(',', Berita::STATUS_LIST)],
@@ -129,7 +129,7 @@ class BeritaController extends Controller
         ], [
             'required'           => ':attribute wajib diisi.',
             'in'                 => 'Pilihan :attribute tidak valid.',
-            'judul_berita.max'   => 'Judul berita maksimal 255 karakter.',
+            'judul_berita.max'   => 'Judul berita maksimal 150 karakter.',
             'gambar_cover.image' => 'Gambar sampul harus berupa berkas gambar.',
             'gambar_cover.mimes' => 'Gambar sampul harus berformat JPG, PNG, atau WEBP.',
             'gambar_cover.max'   => 'Ukuran gambar sampul maksimal 2 MB.',

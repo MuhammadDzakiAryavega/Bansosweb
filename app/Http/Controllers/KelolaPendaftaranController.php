@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Alternatif;
 use App\Models\Pendaftaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
-class PendaftaranController extends Controller
+class KelolaPendaftaranController extends Controller
 {
     public function index(Request $request)
     {

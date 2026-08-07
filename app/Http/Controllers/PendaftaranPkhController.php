@@ -46,7 +46,7 @@ class PendaftaranPkhController extends Controller
         }
 
         $validated = $request->validate([
-            'nama'              => ['required', 'string', 'max:255'],
+            'nama'              => ['required', 'string', 'max:100'],
             'nik'               => ['required', 'digits:16'],
             'desa'              => ['required', Rule::in(Pendaftaran::DESA)],
             'alamat'            => ['required', 'string', 'max:500'],

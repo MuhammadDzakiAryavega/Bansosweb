@@ -21,6 +21,17 @@
                         Peringkat disusun dari skor preferensi <span class="font-semibold">V<sub>i</sub> = Σ (bobot × nilai ternormalisasi)</span>.
                         Semakin tinggi skor, semakin diprioritaskan sebagai penerima PKH.
                     </p>
+                    <p class="mt-3 text-sm text-slate-500 leading-relaxed max-w-2xl">
+                        Normalisasi memakai <span class="font-semibold text-slate-700">nilai ideal</span> tiap kriteria, yaitu nilai sub-kriteria
+                        tertinggi pada <a href="{{ route('admin.pkh.kriteria') }}" class="font-semibold text-[#14346B] underline hover:no-underline">Kelola Kriteria</a>.
+                        Karena acuannya tetap, skor seorang calon tidak berubah ketika calon lain ditambah, dihapus, atau disaring per desa.
+                        Skor 1,0000 hanya dicapai calon yang berada pada kategori terberat di seluruh kriteria.
+                    </p>
+                    <p class="mt-3 text-sm text-slate-500 leading-relaxed max-w-2xl">
+                        <span class="font-semibold text-slate-700">Ambang kelayakan {{ number_format($ambang, 2, ',', '.') }}.</span>
+                        Calon dengan skor V di bawah angka tersebut dinyatakan <span class="font-semibold text-[#C8102E]">tidak menerima PKH</span>,
+                        meski namanya tetap tercantum pada daftar peringkat sebagai bahan pertimbangan periode berikutnya.
+                    </p>
                 </div>
             </div>
         </div>
@@ -53,13 +64,18 @@
             @endforeach
         </select>
         @if ($desaAktif)
-            <span class="text-xs text-slate-500 leading-relaxed">
-                Normalisasi &amp; perankingan dihitung khusus calon <span class="font-semibold text-slate-700">Desa {{ $desaAktif }}</span>.
+            <span class="text-xs text-slate-500 leading-relaxed max-w-lg">
+                Perankingan dibatasi pada calon <span class="font-semibold text-slate-700">Desa {{ $desaAktif }}</span>; skor tiap calon tetap sama seperti pada mode gabungan.
             </span>
-            <a href="{{ route('admin.pkh.hasil') }}" class="text-sm font-semibold text-slate-500 hover:text-[#14346B] transition-colors ml-auto">Reset</a>
+            <a href="{{ route('admin.pkh.hasil') }}" class="text-sm font-semibold text-slate-500 hover:text-[#14346B] transition-colors">Reset</a>
         @else
-            <span class="text-xs text-slate-500">Seluruh calon se-Teramang Jaya. Pilih desa untuk perankingan per desa.</span>
+            <span class="text-xs text-slate-500 max-w-lg">Seluruh calon se-Teramang Jaya. Pilih desa untuk perankingan per desa.</span>
         @endif
+
+        <a href="{{ route('admin.pkh.hasil.laporan', $desaAktif ? ['desa' => $desaAktif] : []) }}"
+           class="ml-auto inline-flex items-center gap-2 bg-emerald-600 text-white px-5 py-2.5 rounded-md text-sm font-semibold hover:bg-emerald-700 transition-colors">
+            <i class="fas fa-file-excel text-xs"></i> Unduh Laporan Excel
+        </a>
     </form>
 
     @if ($belum->isNotEmpty())
@@ -80,6 +96,15 @@
         <span class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Keluaran</span>
         <h3 class="text-lg md:text-xl font-bold text-[#0E2650] mt-2">Peringkat Calon Penerima</h3>
         <div class="w-12 h-1 bg-[#C8102E] mt-4"></div>
+        @if ($hasil->isNotEmpty())
+            @php $jmlLayak = $hasil->where('layak', true)->count(); @endphp
+            <p class="mt-4 text-sm text-slate-600">
+                Dari <span class="font-semibold text-slate-800">{{ $hasil->count() }} calon</span> yang dinilai lengkap,
+                <span class="font-semibold text-emerald-700">{{ $jmlLayak }} layak</span> menerima PKH dan
+                <span class="font-semibold text-rose-700">{{ $hasil->count() - $jmlLayak }} tidak layak</span>
+                (skor V di bawah {{ number_format($ambang, 2, ',', '.') }}).
+            </p>
+        @endif
     </div>
 
     @if ($hasil->isEmpty())
@@ -112,12 +137,13 @@
                                 <th class="text-center px-4 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500" title="{{ $k['label'] }} (ternormalisasi)">{{ $k['kode'] }}</th>
                             @endforeach
                             <th class="text-right px-5 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Skor (V)</th>
+                            <th class="text-center px-5 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Status</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-200">
                         @foreach ($hasil as $row)
                             @php $peringkat = $loop->iteration; @endphp
-                            <tr class="{{ $peringkat === 1 ? 'bg-emerald-50/40' : 'hover:bg-slate-50' }} transition-colors">
+                            <tr class="{{ ! $row['layak'] ? 'bg-rose-50/40' : ($peringkat === 1 ? 'bg-emerald-50/40' : 'hover:bg-slate-50') }} transition-colors">
                                 <td class="px-5 py-4">
                                     <span class="inline-flex items-center justify-center w-8 h-8 rounded-md text-sm font-bold {{ $peringkat === 1 ? 'bg-[#C8102E] text-white' : ($peringkat <= 3 ? 'bg-[#14346B]/10 text-[#14346B]' : 'bg-slate-100 text-slate-500') }}">
                                         {{ $peringkat }}
@@ -129,7 +155,7 @@
                                             <p class="font-semibold text-slate-900 truncate">{{ $row['alt']->user->name ?? '(warga terhapus)' }}</p>
                                             <p class="text-xs text-slate-400 tabular-nums">NIK {{ $row['alt']->user->nik ?? '—' }}</p>
                                         </div>
-                                        @if ($peringkat === 1)
+                                        @if ($peringkat === 1 && $row['layak'])
                                             <span class="text-[10px] font-semibold px-2 py-1 rounded border bg-[#C8102E]/5 text-[#C8102E] border-[#C8102E]/20 whitespace-nowrap">Prioritas</span>
                                         @endif
                                     </div>
@@ -141,7 +167,20 @@
                                     <td class="px-4 py-4 text-center text-slate-600 tabular-nums">{{ number_format($row['norm'][$slug], 3) }}</td>
                                 @endforeach
                                 <td class="px-5 py-4 text-right">
-                                    <span class="font-bold tabular-nums {{ $peringkat === 1 ? 'text-[#C8102E]' : 'text-[#0E2650]' }}">{{ number_format($row['skor'], 4) }}</span>
+                                    <span class="font-bold tabular-nums {{ $row['layak'] ? ($peringkat === 1 ? 'text-[#C8102E]' : 'text-[#0E2650]') : 'text-rose-600' }}">{{ number_format($row['skor'], 4) }}</span>
+                                </td>
+                                <td class="px-5 py-4 text-center">
+                                    @if ($row['layak'])
+                                        <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded border bg-emerald-50 text-emerald-700 border-emerald-200 whitespace-nowrap"
+                                              title="Skor V ≥ {{ number_format($ambang, 2, ',', '.') }} — menerima PKH">
+                                            <i class="fas fa-circle-check text-[10px]"></i> Layak
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded border bg-rose-50 text-rose-700 border-rose-200 whitespace-nowrap"
+                                              title="Skor V < {{ number_format($ambang, 2, ',', '.') }} — tidak menerima PKH">
+                                            <i class="fas fa-circle-xmark text-[10px]"></i> Tidak Layak
+                                        </span>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach
@@ -155,7 +194,7 @@
             <span class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Rincian</span>
             <h3 class="text-lg md:text-xl font-bold text-[#0E2650] mt-2">Matriks Keputusan</h3>
             <div class="w-12 h-1 bg-[#C8102E] mt-4"></div>
-            <p class="text-sm text-slate-500 mt-4 leading-relaxed max-w-2xl">Nilai crisp tiap calon sebelum normalisasi. Nilai maksimum tiap kolom (acuan normalisasi benefit) ditandai.</p>
+            <p class="text-sm text-slate-500 mt-4 leading-relaxed max-w-2xl">Nilai crisp tiap calon sebelum normalisasi. Baris terakhir adalah nilai ideal tiap kriteria — pembagi normalisasi benefit — dan nilai calon yang menyentuh angka itu ditandai.</p>
         </div>
 
         <div class="border border-slate-200 rounded-lg bg-white overflow-hidden">
@@ -182,7 +221,7 @@
                             </tr>
                         @endforeach
                         <tr class="bg-slate-50 border-t-2 border-slate-200">
-                            <td class="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Maks. kolom</td>
+                            <td class="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Nilai ideal</td>
                             @foreach (array_keys($kriteria) as $slug)
                                 <td class="px-4 py-3 text-center font-bold text-[#14346B] tabular-nums">{{ $maks[$slug] }}</td>
                             @endforeach

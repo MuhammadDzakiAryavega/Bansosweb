@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
-class UserController extends Controller
+class KelolaUserController extends Controller
 {
     public function index(Request $request)
     {
@@ -123,22 +122,23 @@ class UserController extends Controller
         $wajibSandi = $user ? 'nullable' : 'required';
 
         return $request->validate([
-            'name'     => ['required', 'string', 'max:255'],
+            'name'     => ['required', 'string', 'max:100'],
             'nik'      => ['required', 'digits:16', Rule::unique('users', 'nik')->ignore($user)],
-            'email'    => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user)],
+            'email'    => ['required', 'email', 'max:100', Rule::unique('users', 'email')->ignore($user)],
             'role'     => ['required', Rule::in(User::ROLE_LIST)],
-            'password' => [$wajibSandi, 'confirmed', 'min:8'],
+            'password' => [$wajibSandi, 'confirmed', 'min:8', 'max:20'],
         ], [
             'required'           => ':attribute wajib diisi.',
-            'name.max'           => 'Nama lengkap maksimal 255 karakter.',
+            'name.max'           => 'Nama lengkap maksimal 100 karakter.',
             'nik.digits'         => 'NIK harus terdiri dari 16 digit angka.',
             'nik.unique'         => 'NIK ini sudah terdaftar pada portal.',
             'email.email'        => 'Format alamat surel tidak valid.',
-            'email.max'          => 'Alamat surel maksimal 255 karakter.',
+            'email.max'          => 'Alamat surel maksimal 100 karakter.',
             'email.unique'       => 'Alamat surel ini sudah terdaftar pada portal.',
             'role.in'            => 'Pilihan peran tidak valid.',
             'password.confirmed' => 'Konfirmasi kata sandi tidak sama.',
             'password.min'       => 'Kata sandi minimal 8 karakter.',
+            'password.max'       => 'Kata sandi maksimal 20 karakter.',
         ], [
             'name'     => 'Nama lengkap',
             'nik'      => 'NIK',

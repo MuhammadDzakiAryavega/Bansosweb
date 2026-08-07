@@ -10,8 +10,10 @@ return new class extends Migration
     {
         Schema::create('galeris', function (Blueprint $table) {
             $table->id('id_galeri');
-            $table->string('judul_kegiatan');
-            $table->string('slug')->unique();
+            // Petugas yang mencatat kegiatan ini; dibiarkan kosong bila akunnya dihapus.
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->string('judul_kegiatan', 150);
+            $table->string('slug', 175)->unique(); // judul ter-slug + akhiran anti-bentrok
             $table->date('tgl_pelaksanaan');
             $table->text('deskripsi_singkat');
             $table->timestamps();
@@ -21,7 +23,7 @@ return new class extends Migration
         Schema::create('galeri_fotos', function (Blueprint $table) {
             $table->id('id_foto');
             $table->foreignId('galeri_id')->constrained('galeris', 'id_galeri')->cascadeOnDelete();
-            $table->string('path');
+            $table->string('path', 150);
             $table->unsignedSmallInteger('urutan')->default(0);
             $table->timestamps();
 

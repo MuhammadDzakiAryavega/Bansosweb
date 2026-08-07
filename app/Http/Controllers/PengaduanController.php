@@ -16,11 +16,11 @@ class PengaduanController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'nama_pengadu'    => ['required', 'string', 'max:255'],
-            'email_pengadu'   => ['required', 'email', 'max:255'],
+            'nama_pengadu'    => ['required', 'string', 'max:100'],
+            'email_pengadu'   => ['required', 'email', 'max:100'],
             'no_hp_pengadu'   => ['nullable', 'string', 'max:20'],
             'alamat_pengadu'  => ['required', 'string', 'max:500'],
-            'judul_pengaduan' => ['required', 'string', 'max:255'],
+            'judul_pengaduan' => ['required', 'string', 'max:150'],
             'isi_pengaduan'   => ['required', 'string'],
             'lampiran'        => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
         ], [

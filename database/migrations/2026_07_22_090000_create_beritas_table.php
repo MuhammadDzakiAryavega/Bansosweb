@@ -10,8 +10,10 @@ return new class extends Migration
     {
         Schema::create('beritas', function (Blueprint $table) {
             $table->id('id_berita');
-            $table->string('judul_berita');
-            $table->string('slug')->unique();
+            // Petugas yang mencatat berita ini; dibiarkan kosong bila akunnya dihapus.
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->string('judul_berita', 150);
+            $table->string('slug', 175)->unique(); // judul ter-slug + akhiran anti-bentrok
             $table->enum('kategori', [
                 'Pengumuman',
                 'Kegiatan',
@@ -21,7 +23,7 @@ return new class extends Migration
             ])->default('Pengumuman');
             $table->enum('penulis', ['Admin Utama', 'Editor'])->default('Admin Utama');
             $table->enum('status_berita', ['Draft', 'Published'])->default('Draft');
-            $table->string('gambar_cover')->nullable();
+            $table->string('gambar_cover', 150)->nullable();
             $table->text('isi_artikel');
             $table->timestamp('tanggal_publikasi')->nullable();
             $table->timestamps();

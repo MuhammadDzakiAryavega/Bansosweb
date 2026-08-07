@@ -40,7 +40,7 @@
                             Judul Berita <span class="text-[#C8102E]">*</span>
                         </label>
                         <input type="text" id="judul_berita" name="judul_berita" value="{{ $nilai('judul_berita') }}"
-                               maxlength="255" placeholder="Contoh: Penyaluran Bantuan PKH Tahap III Tahun 2026"
+                               maxlength="150" placeholder="Contoh: Penyaluran Bantuan PKH Tahap III Tahun 2026"
                                class="w-full px-4 py-3 rounded-md border text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-1 transition @error('judul_berita') border-rose-300 focus:border-[#C8102E] focus:ring-[#C8102E] @else border-slate-300 focus:border-[#14346B] focus:ring-[#14346B] @enderror">
                         @error('judul_berita')
                             <p class="mt-2 text-xs text-[#C8102E]">{{ $message }}</p>

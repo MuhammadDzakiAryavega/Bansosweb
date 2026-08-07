@@ -1,21 +1,23 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Arsip;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-class ArsipController extends Controller
+class KelolaArsipController extends Controller
 {
     /** Nilai penanda bahwa admin memilih membuat klasifikasi baru. */
     private const KLASIFIKASI_BARU = '__baru__';
 
     /** Lampiran disimpan di disk privat agar hanya bisa diunduh lewat rute admin. */
     private const DISK = 'local';
+
+    /** Selaras dengan panjang kolom arsips.lampiran_nama pada migrasi. */
+    private const PANJANG_NAMA_LAMPIRAN = 150;
 
     public function index(Request $request)
     {
@@ -78,6 +80,7 @@ class ArsipController extends Controller
         $data = $this->validasi($request);
 
         $data = array_merge($data, $this->simpanLampiran($request));
+        $data['user_id'] = $request->user()->id; // petugas yang mengunggah
         $data['tanggal_publikasi'] = $data['status_publikasi'] === 'Published' ? now() : null;
 
         Arsip::create($data);
@@ -154,7 +157,7 @@ class ArsipController extends Controller
                 Rule::unique('arsips', 'nomor_arsip')->ignore($arsip?->id_arsip, 'id_arsip'),
             ],
             'tgl_dokumen'        => ['required', 'date'],
-            'judul_arsip'        => ['required', 'string', 'max:255'],
+            'judul_arsip'        => ['required', 'string', 'max:150'],
             'klasifikasi'        => ['required', Rule::in(array_merge($klasifikasiList, [self::KLASIFIKASI_BARU]))],
             'klasifikasi_baru'   => ['nullable', 'required_if:klasifikasi,' . self::KLASIFIKASI_BARU, 'string', 'max:60'],
             'deskripsi_tambahan' => ['nullable', 'string', 'max:2000'],
@@ -167,7 +170,7 @@ class ArsipController extends Controller
             'nomor_arsip.regex'     => 'Nomor arsip hanya boleh berisi huruf, angka, garis miring, titik, dan tanda hubung.',
             'nomor_arsip.unique'    => 'Nomor arsip ini sudah dipakai oleh arsip lain.',
             'tgl_dokumen.date'      => 'Tanggal dokumen tidak valid.',
-            'judul_arsip.max'       => 'Judul arsip maksimal 255 karakter.',
+            'judul_arsip.max'       => 'Judul arsip maksimal 150 karakter.',
             'klasifikasi_baru.required_if' => 'Nama klasifikasi baru wajib diisi.',
             'klasifikasi_baru.max'  => 'Nama klasifikasi baru maksimal 60 karakter.',
             'deskripsi_tambahan.max' => 'Deskripsi tambahan maksimal 2000 karakter.',
@@ -209,9 +212,25 @@ class ArsipController extends Controller
 
         return [
             'lampiran'        => $berkas->store('arsip', self::DISK),
-            'lampiran_nama'   => $berkas->getClientOriginalName(),
+            'lampiran_nama'   => static::pangkasNamaBerkas($berkas->getClientOriginalName()),
             'lampiran_ukuran' => $berkas->getSize(),
         ];
+    }
+
+    /**
+     * Memangkas nama berkas agar muat pada kolom lampiran_nama (varchar 150),
+     * dengan tetap mempertahankan ekstensinya supaya ikon & unduhan tetap benar.
+     */
+    private static function pangkasNamaBerkas(string $nama): string
+    {
+        if (mb_strlen($nama) <= self::PANJANG_NAMA_LAMPIRAN) {
+            return $nama;
+        }
+
+        $ekstensi = pathinfo($nama, PATHINFO_EXTENSION);
+        $akhiran = $ekstensi === '' ? '' : '.' . $ekstensi;
+
+        return mb_substr($nama, 0, self::PANJANG_NAMA_LAMPIRAN - mb_strlen($akhiran)) . $akhiran;
     }
 
     private function hapusBerkas(?string $path): void

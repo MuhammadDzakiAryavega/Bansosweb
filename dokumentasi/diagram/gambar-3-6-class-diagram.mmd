@@ -1,0 +1,216 @@
+---
+config:
+  theme: base
+  themeVariables:
+    primaryColor: "#DCEDE5"
+    primaryBorderColor: "#3F6F62"
+    primaryTextColor: "#1F2937"
+    lineColor: "#6E8F85"
+    fontFamily: "Arial, Helvetica, sans-serif"
+    fontSize: "14px"
+  class:
+    hideEmptyMembersBox: false
+    padding: 14
+    nodeSpacing: 60
+    rankSpacing: 60
+---
+classDiagram
+    direction TB
+
+    class EnsureUserHasRole {
+        <<Middleware>>
+        +handle(request, next, roles) Response
+    }
+
+    class AuthController {
+        <<Controller>>
+        +register(request)
+        +login(request)
+        +dashboard()
+        +profile()
+        +updatePassword(request)
+        +logout(request)
+    }
+
+    class PendaftaranPkhController {
+        <<Controller>>
+        +create()
+        +store(request)
+    }
+
+    class KelolaPendaftaranController {
+        <<Controller>>
+        +index(request)
+        +show(pendaftaran)
+        +verifikasi(pendaftaran)
+        +tolak(request, pendaftaran)
+        +foto(pendaftaran, jenis)
+        +destroy(pendaftaran)
+    }
+
+    class KelolaPkhController {
+        <<Controller>>
+        +KRITERIA : array
+        +kriteria()
+        +storeSub(request, kriteria)
+        +updateSub(request, sub)
+        +destroySub(sub)
+        +hasil(request)
+    }
+
+    class KelolaPkhPenilaianController {
+        <<Controller>>
+        +index(request)
+        +edit(alternatif)
+        +update(request, alternatif)
+        +destroy(alternatif)
+    }
+
+    class User {
+        <<Model>>
+        +int id
+        +string name
+        +string nik
+        +string email
+        +string password
+        +enum role
+        +ROLE_LIST : array
+        +isAdmin() bool
+        +isSeksi() bool
+        +isPetugas() bool
+        +labelRole() string
+        +pengaduans() HasMany
+    }
+
+    class Pendaftaran {
+        <<Model>>
+        +int id
+        +int user_id
+        +string nama
+        +string nik
+        +string alamat
+        +string desa
+        +string no_hp
+        +string penghasilan
+        +int jumlah_tanggungan
+        +string kondisi_rumah
+        +string status_pekerjaan
+        +string kepemilikan_aset
+        +string foto_depan
+        +string foto_belakang
+        +string foto_ruang_tamu
+        +string foto_wc
+        +string foto_ktp
+        +enum status
+        +text catatan_admin
+        +DESA : array
+        +STATUS_LIST : array
+        +user() BelongsTo
+        +jenisFoto() array
+        +sudahDitinjau() bool
+        +badgeStatus() string
+    }
+
+    class Alternatif {
+        <<Model>>
+        +int id
+        +int user_id
+        +string desa
+        +user() BelongsTo
+        +penilaian() HasMany
+        +nilaiPerKriteria() array
+    }
+
+    class Penilaian {
+        <<Model>>
+        +int id
+        +int alternatif_id
+        +string kriteria
+        +int sub_kriteria_id
+        +alternatif() BelongsTo
+        +subKriteria() BelongsTo
+    }
+
+    class SubKriteria {
+        <<Model>>
+        +int id
+        +string kriteria
+        +string nama
+        +int nilai
+        +penilaian() HasMany
+    }
+
+    class Pengaduan {
+        <<Model>>
+        +int id_pengaduan
+        +int user_id
+        +string judul_pengaduan
+        +text isi_pengaduan
+        +string status_pengaduan
+        +string url_lampiran
+    }
+
+    class Berita {
+        <<Model>>
+        +int id_berita
+        +string judul_berita
+        +string slug
+        +string kategori
+        +string status_berita
+        +scopeTerbit(query)
+        +ringkasan(panjang) string
+        +buatSlug(judul) string
+    }
+
+    class Galeri {
+        <<Model>>
+        +int id_galeri
+        +string judul_kegiatan
+        +string slug
+        +date tgl_pelaksanaan
+        +fotos() HasMany
+        +sampul() GaleriFoto
+    }
+
+    class GaleriFoto {
+        <<Model>>
+        +int id_foto
+        +int galeri_id
+        +string path
+        +int urutan
+        +galeri() BelongsTo
+    }
+
+    class Arsip {
+        <<Model>>
+        +int id_arsip
+        +string nomor_arsip
+        +string judul_arsip
+        +string klasifikasi
+        +string lampiran
+        +string status_publikasi
+        +scopeTerbit(query)
+        +ukuranLampiran() string
+        +nomorBerikutnya(tanggal) string
+    }
+
+    EnsureUserHasRole ..> KelolaPendaftaranController
+    EnsureUserHasRole ..> KelolaPkhController
+    EnsureUserHasRole ..> KelolaPkhPenilaianController
+
+    AuthController ..> User
+    PendaftaranPkhController ..> Pendaftaran
+    KelolaPendaftaranController ..> Pendaftaran
+    KelolaPendaftaranController ..> Alternatif
+    KelolaPkhController ..> SubKriteria
+    KelolaPkhController ..> Alternatif
+    KelolaPkhPenilaianController ..> Alternatif
+    KelolaPkhPenilaianController ..> Penilaian
+    KelolaPkhPenilaianController ..> SubKriteria
+
+    User "1" --> "0..*" Pendaftaran : mengajukan
+    User "1" --> "0..1" Alternatif : menjadi calon
+    User "1" --> "0..*" Pengaduan : mengirim
+    Alternatif "1" *-- "0..*" Penilaian : dinilai pada
+    SubKriteria "1" --> "0..*" Penilaian : dipilih sebagai
+    Galeri "1" *-- "0..*" GaleriFoto : memuat

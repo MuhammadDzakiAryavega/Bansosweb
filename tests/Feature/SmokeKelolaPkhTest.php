@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Http\Controllers\Admin\PkhController;
+use App\Http\Controllers\KelolaPkhController;
 use App\Models\Alternatif;
 use App\Models\Pendaftaran;
 use App\Models\Penilaian;
@@ -53,7 +53,7 @@ class SmokeKelolaPkhTest extends TestCase
     private function seedSubKriteria(): array
     {
         $peta = [];
-        foreach (array_keys(PkhController::KRITERIA) as $slug) {
+        foreach (array_keys(KelolaPkhController::KRITERIA) as $slug) {
             $peta[$slug] = [
                 'tinggi' => SubKriteria::create(['kriteria' => $slug, 'nama' => 'Tinggi', 'nilai' => 5])->id,
                 'rendah' => SubKriteria::create(['kriteria' => $slug, 'nama' => 'Rendah', 'nilai' => 1])->id,
@@ -76,7 +76,7 @@ class SmokeKelolaPkhTest extends TestCase
             ->assertSee('Tidak Punya Aset');
 
         // C1 sampai C5 tampil berurutan pada halaman yang sama.
-        foreach (PkhController::KRITERIA as $kriteria) {
+        foreach (KelolaPkhController::KRITERIA as $kriteria) {
             $halaman->assertSee($kriteria['kode'])->assertSee($kriteria['label']);
         }
     }
@@ -108,25 +108,21 @@ class SmokeKelolaPkhTest extends TestCase
         // gabungan tidak ikut muncul di kriteria lain.
         $this->actingAs($this->admin())
             ->post('/admin/pkh/penghasilan/sub', [])
-            ->assertSessionHasErrors(['nama', 'nilai'], null, PkhController::bagKriteria('penghasilan'));
+            ->assertSessionHasErrors(['nama', 'nilai'], null, KelolaPkhController::bagKriteria('penghasilan'));
     }
 
-    public function test_seksi_bisa_mendaftarkan_dan_menilai_calon(): void
+    public function test_seksi_bisa_menilai_calon(): void
     {
         $seksi = $this->seksi();
         $subs = $this->seedSubKriteria();
         $budi = $this->warga('Budi', '1111111111111111');
 
-        // Daftarkan sebagai calon (dengan desa).
-        $this->actingAs($seksi)->post('/admin/pkh/penilaian', ['user_id' => $budi->id, 'desa' => Pendaftaran::DESA[0]])
-            ->assertRedirect(route('admin.pkh.penilaian.index'));
-
-        $alt = Alternatif::where('user_id', $budi->id)->firstOrFail();
-        $this->assertSame(Pendaftaran::DESA[0], $alt->desa);
+        // Calon lahir dari verifikasi pendaftaran, bukan input manual di halaman penilaian.
+        $alt = Alternatif::create(['user_id' => $budi->id, 'desa' => Pendaftaran::DESA[0]]);
 
         // Simpan penilaian (pilih sub-kriteria "Tinggi" tiap kriteria).
         $pilihan = [];
-        foreach (array_keys(PkhController::KRITERIA) as $slug) {
+        foreach (array_keys(KelolaPkhController::KRITERIA) as $slug) {
             $pilihan[$slug] = $subs[$slug]['tinggi'];
         }
 
@@ -134,16 +130,6 @@ class SmokeKelolaPkhTest extends TestCase
             ->assertRedirect(route('admin.pkh.penilaian.index'));
 
         $this->assertSame(5, Penilaian::where('alternatif_id', $alt->id)->count());
-    }
-
-    public function test_warga_tidak_bisa_didaftarkan_dua_kali(): void
-    {
-        $seksi = $this->seksi();
-        $siti = $this->warga('Siti', '2222222222222222');
-        Alternatif::create(['user_id' => $siti->id]);
-
-        $this->actingAs($seksi)->post('/admin/pkh/penilaian', ['user_id' => $siti->id])
-            ->assertSessionHasErrors('user_id');
     }
 
     public function test_perankingan_saw_mengurutkan_dari_skor_tertinggi(): void
@@ -157,7 +143,7 @@ class SmokeKelolaPkhTest extends TestCase
         $altBudi = Alternatif::create(['user_id' => $budi->id]);
         $altSari = Alternatif::create(['user_id' => $sari->id]);
 
-        foreach (array_keys(PkhController::KRITERIA) as $slug) {
+        foreach (array_keys(KelolaPkhController::KRITERIA) as $slug) {
             Penilaian::create(['alternatif_id' => $altBudi->id, 'kriteria' => $slug, 'sub_kriteria_id' => $subs[$slug]['tinggi']]);
             Penilaian::create(['alternatif_id' => $altSari->id, 'kriteria' => $slug, 'sub_kriteria_id' => $subs[$slug]['rendah']]);
         }
@@ -166,6 +152,28 @@ class SmokeKelolaPkhTest extends TestCase
             ->assertSeeInOrder(['Budi Prioritas', 'Sari Rendah'])
             ->assertSee('1.0000')
             ->assertSee('0.2000');
+    }
+
+    /**
+     * Normalisasi memakai nilai ideal dari data master kriteria, bukan nilai
+     * maksimum antar-calon. Calon tunggal karena itu tidak otomatis bernilai
+     * 1,0000 — skornya tetap mencerminkan kondisi ekonominya sendiri.
+     */
+    public function test_calon_tunggal_tidak_otomatis_bernilai_sempurna(): void
+    {
+        $seksi = $this->seksi();
+        $subs = $this->seedSubKriteria();
+        $sari = $this->warga('Sari Sendirian', '3333333333333333');
+        $alt = Alternatif::create(['user_id' => $sari->id]);
+
+        foreach (array_keys(KelolaPkhController::KRITERIA) as $slug) {
+            Penilaian::create(['alternatif_id' => $alt->id, 'kriteria' => $slug, 'sub_kriteria_id' => $subs[$slug]['rendah']]);
+        }
+
+        // Nilai 1 dari ideal 5 pada semua kriteria → V = Σ bobot × 0,2 = 0,2000.
+        $this->actingAs($seksi)->get('/admin/pkh/hasil-akhir')->assertOk()
+            ->assertSee('0.2000')
+            ->assertDontSee('1.0000');
     }
 
     public function test_hasil_dapat_disaring_per_desa(): void
@@ -178,8 +186,8 @@ class SmokeKelolaPkhTest extends TestCase
         $altA = Alternatif::create(['user_id' => $a->id, 'desa' => Pendaftaran::DESA[0]]);
         $altB = Alternatif::create(['user_id' => $b->id, 'desa' => Pendaftaran::DESA[1]]);
 
-        foreach (array_keys(PkhController::KRITERIA) as $slug) {
-            Penilaian::create(['alternatif_id' => $altA->id, 'kriteria' => $slug, 'sub_kriteria_id' => $subs[$slug]['tinggi']]);
+        foreach (array_keys(KelolaPkhController::KRITERIA) as $slug) {
+            Penilaian::create(['alternatif_id' => $altA->id, 'kriteria' => $slug, 'sub_kriteria_id' => $subs[$slug]['rendah']]);
             Penilaian::create(['alternatif_id' => $altB->id, 'kriteria' => $slug, 'sub_kriteria_id' => $subs[$slug]['tinggi']]);
         }
 
@@ -187,9 +195,11 @@ class SmokeKelolaPkhTest extends TestCase
         $this->actingAs($seksi)->get('/admin/pkh/hasil-akhir')->assertOk()
             ->assertSee('Warga Desa A')->assertSee('Warga Desa B');
 
-        // Filter satu desa: hanya calon desa itu yang diperingkat.
+        // Filter satu desa: hanya calon desa itu yang diperingkat, dan skornya
+        // tidak ikut berubah meski ia menjadi satu-satunya calon yang tampil.
         $this->actingAs($seksi)->get('/admin/pkh/hasil-akhir?desa=' . urlencode(Pendaftaran::DESA[0]))->assertOk()
-            ->assertSee('Warga Desa A')->assertDontSee('Warga Desa B');
+            ->assertSee('Warga Desa A')->assertDontSee('Warga Desa B')
+            ->assertSee('0.2000');
     }
 
     public function test_calon_belum_lengkap_dikecualikan_dari_ranking(): void

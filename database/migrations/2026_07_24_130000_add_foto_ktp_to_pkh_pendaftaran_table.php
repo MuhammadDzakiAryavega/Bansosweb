@@ -10,7 +10,7 @@ return new class extends Migration
     {
         // Foto diri pengaju sambil memegang KTP (verifikasi identitas).
         Schema::table('pkh_pendaftaran', function (Blueprint $table) {
-            $table->string('foto_ktp')->nullable()->after('foto_wc');
+            $table->string('foto_ktp', 150)->nullable()->after('foto_wc');
         });
     }
 

@@ -43,7 +43,7 @@
                             Judul Kegiatan <span class="text-[#C8102E]">*</span>
                         </label>
                         <input type="text" id="judul_kegiatan" name="judul_kegiatan" value="{{ $nilai('judul_kegiatan') }}"
-                               maxlength="255" placeholder="Contoh: Penyaluran Bantuan PKH Tahap III Kecamatan Teramang Jaya"
+                               maxlength="150" placeholder="Contoh: Penyaluran Bantuan PKH Tahap III Kecamatan Teramang Jaya"
                                class="w-full px-4 py-3 rounded-md border text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-1 transition @error('judul_kegiatan') border-rose-300 focus:border-[#C8102E] focus:ring-[#C8102E] @else border-slate-300 focus:border-[#14346B] focus:ring-[#14346B] @enderror">
                         @error('judul_kegiatan')
                             <p class="mt-2 text-xs text-[#C8102E]">{{ $message }}</p>

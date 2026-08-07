@@ -13,7 +13,7 @@ return new class extends Migration
         Schema::create('pkh_pendaftaran', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
-            $table->string('nama');
+            $table->string('nama', 100);
             $table->string('nik', 16);
             $table->text('alamat');
             $table->string('no_hp', 20)->nullable();

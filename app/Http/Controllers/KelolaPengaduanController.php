@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Pengaduan;
 use Illuminate\Http\Request;
 
-class PengaduanController extends Controller
+class KelolaPengaduanController extends Controller
 {
     private const STATUS_LIST = ['Baru', 'Pending', 'Dalam Proses', 'Selesai', 'Decline'];
 
